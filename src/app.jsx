@@ -39,20 +39,31 @@ export class App extends ReactiveComponent {
 		this.seedAccount = this.seed.map(s => s ? secretStore().accountFromPhrase(s) : undefined)
 		this.seedAccount.use()
 		this.runtime = new Bond;
-		this.pkd = new Bond;
 
-		addCodecTransform(
-			// 'PreparedVk' : 'Vec<u8>',
-			'PreparedVk', 'Vec<u8>'			
-			// 'PreparedVk',  {
-			// 	0: 'Vec<u8>'
-			// }			
-			// 'H256': 'Hash',
-			// 'SimpleNum': 'Hash'
-		);
+		this.address = new Bond;
+		this.proof = new Bond;
+		this.addressSender = new Bond;
+		this.addressRecipient = new Bond;
+		this.valueSender = new Bond;
+		this.valueRecipient = new Bond;
+		this.balanceSender = new Bond;
+		this.rk = new Bond;
+
+		addCodecTransform(			
+			'PreparedVk', 'Vec<u8>'				
+		);		
 		addCodecTransform(
 			'PkdAddress', 'Hash'
-		)
+		);
+		addCodecTransform(
+			'Ciphertext', 'Vec<u8>' // 64bytes
+		);
+		addCodecTransform(
+			'Proof', 'Vec<u8>'
+		);
+		addCodecTransform(
+			'SigVerificationKey', 'Hash'
+		);		
 	}
 
 	readyRender() {
@@ -244,92 +255,72 @@ export class App extends ReactiveComponent {
 				</Header>				
 				<div style={{ paddingBottom: '1em' }}></div>
 				<Label>Prepared vk
-						<Label.Detail>
-							<Pretty value={runtime.template.verifyingKey} />
-							<Divider hidden />
-							<Pretty value={runtime.template.pkdAddr} />
-							{/* <Divider hidden />
-							<Pretty value={runtime.template.simpleNum} /> */}
+					<Label.Detail>
+						<Pretty value={runtime.confTransfer.verifyingKey} />	
 					</Label.Detail>
 				</Label>
+				<Divider hidden />
+				{/* <InputBond
+					bond={this.address}
+					reversible
+					placeholder='Address'
+					validator={n => n || null}
+					// action={<Button content="Another" onClick={() => this.seed.trigger(generateMnemonic())} />}
+					iconPosition='left'
+				// icon={<i style={{ opacity: 1 }} className='icon'><Identicon account={this.seedAccount} size={28} style={{ marginTop: '5px' }} /></i>}
+				/> */}
+				<Label>Encrypted Balance					
+					<Label.Detail>
+						<Pretty value={runtime.confTransfer.encryptedBalance("0x416c696365202020202020202020202020202020202020202020202020202020")} />																
+					</Label.Detail>
+				</Label>
+				<Divider hidden />
+				<Label>Hash
+					<Label.Detail>
+						<Pretty value={runtime.confTransfer.h256} />
+					</Label.Detail>
+				</Label>												
 			</Segment>
 			<Divider hidden />
 			<Segment style={{ margin: '1em' }} padded>
 				<Header as='h2'>
 					<Icon name='search' />
 					<Header.Content>
-						Do something
-						<Header.Subheader>Upgrade the runtime using the Sudo module</Header.Subheader>
-					</Header.Content>
-				</Header>
-				<div style={{ paddingBottom: '1em' }}></div>
-				<FileUploadBond bond={this.runtime} content='Select Runtime' />
-				<TransactButton
-					content="Upgrade"
-					icon='warning'
-					tx={{
-						sender: runtime.sudo.key,
-						call: calls.sudo.sudo(calls.consensus.setCode(this.runtime))
-					}}
-				/>
-			</Segment>
-			{/* <Divider hidden />
-			<Segment style={{ margin: '1em' }} padded>
-				<Header as='h2'>
-					<Icon name='send' />
-					<Header.Content>
 						Confidential transfer
 						<Header.Subheader>Confidential transfer</Header.Subheader>
 					</Header.Content>
-				</Header>
-				<div style={{ paddingBottom: '1em' }}>
-					<div style={{ fontSize: 'small' }}>from</div>
-					<SignerBond bond={this.pkd} />
-					<If condition={this.pkd.ready()} then={<span>
-						<Label>Balance
-							<Label.Detail>
-								<Pretty value={runtime.confTransfer.encryptedBalance(this.pkd)} />
-							</Label.Detail>
-						</Label>
-						<Label>Nonce
-							<Label.Detail>
-								<Pretty value={runtime.system.accountNonce(this.pkd)} />
-							</Label.Detail>
-						</Label>
-					</span>} />
-				</div>
-				<div style={{ paddingBottom: '1em' }}>
-					<div style={{ fontSize: 'small' }}>to</div>
-					<AccountIdBond bond={this.pkd} />
-					<If condition={this.pkd.ready()} then={
-						<Label>Balance
-							<Label.Detail>
-								<Pretty value={runtime.confTransfer.encryptedBalance(this.pkd)} />
-							</Label.Detail>
-						</Label>
-					} />
-				</div>
-				<div style={{ paddingBottom: '1em' }}>
-					<div style={{ fontSize: 'small' }}>amount</div>
-					<BalanceBond bond={this.amount} />
-				</div>
+				</Header>					
+				<div style={{ fontSize: 'small' }}>Proof</div>					
+				<InputBond bond={this.proof} />				
+				<div style={{ fontSize: 'small' }}>From</div>					
+				<InputBond bond={this.addressSender} />				
+				<div style={{ fontSize: 'small' }}>To</div>					
+				<InputBond bond={this.addressRecipient} />				
+				<div style={{ fontSize: 'small' }}>Encrypted amount (sender)</div>					
+				<InputBond bond={this.valueSender} />				
+				<div style={{ fontSize: 'small' }}>Encrypted amount (recipient)</div>					
+				<InputBond bond={this.valueRecipient} />				
+				<div style={{ fontSize: 'small' }}>Encrypted balance (sender)</div>					
+				<InputBond bond={this.balanceSender} />				
+				<div style={{ fontSize: 'small' }}>Signature verification key</div>					
+				<InputBond bond={this.rk} />
 				<TransactButton
-					content="Send"
+					content="Confidential transfer"
 					icon='send'
 					tx={{
-						sender: runtime.indices.tryIndex(this.source),
+						sender: this.rk,
 						call: calls.confTransfer.confidentialTransfer(
-							"0x90d4472c246c4808b7eaef1058646e61057e78b878430508fa7817bedaea272f31b13a498edb215abb9b82f4a95c80a3915ea246ba3bc2bb5451980729a972b25fa8f98faae9beac5039d02646f9a012661f29ac40b3c859a2543219733b5cdd169220e41140388ef19144745dc119a346edb2ac64c694f4dcb28334478184c9957aeb7f4f9a171284e81594ac3e362db5972c9481ef2b2efaec528b83c5ef16ab04f6115c9cc2eb166c717521a9ae91c1c935c33714a3d4bd62e4c3b3859057", 
-							"0xe19fc12085334a4b81ec58e9ea0c006c56a94f406d9afb78c34f24cd4c59ed85",
-							"0x497b43f9ea8a7f8521b3b14e87cec916a28e91487c1d30d1c1873220dc17d7bc",
-							"0xfeca4beb6a31a96a2100770f32ad09f8712cb0c87b84ecb9c782cce015ebd317224600bdd8346e460fafe8bb25019ba5c59e47da567effeb463848ea4bde3a60",
-							"0xf824fcc87bd00284c9f803b7064b19634b0aa9e1c6f1a5871e9b3847b1cb69eb224600bdd8346e460fafe8bb25019ba5c59e47da567effeb463848ea4bde3a60",
-							"0xd7b06cd13f9c7f130002200c6537bc11c4aba1bd767e8f397cdb54bb54a4e1bd474de6235c4541f032e8864cbc403b8e91fa8474c6d9e2c0a9b1d2b58b8b68b4",
-							"0xec5aa71f06978a55ba91f0859be754e078e233e40604a7a0205093beb4a7320c",
+							this.proof,
+							this.addressSender,
+							this.addressRecipient,
+							this.valueSender,
+							this.valueRecipient,
+							this.balanceSender,
+							this.rk
 							)
 					}}
 				/>
-			</Segment> */}
+			</Segment>			
 		</div>);
 	}
 }
