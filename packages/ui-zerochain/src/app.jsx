@@ -4,7 +4,7 @@ const { generateMnemonic } = require('bip39')
 import { Icon, List, Label, Header, Segment, Divider, Button } from 'semantic-ui-react';
 import { Bond, TransformBond } from 'oo7';
 import { ReactiveComponent, If, Rspan } from 'oo7-react';
-import { calls, runtime, chain, system, runtimeUp, ss58Encode, addressBook, secretStore, addCodecTransform, encode, decode } from 'oo7-substrate';
+import { calls, runtime, chain, system, runtimeUp, ss58Encode, addressBook, secretStore, addCodecTransform, encode, decode } from 'oo7-zerochain';
 import Identicon from 'polkadot-identicon';
 import { AccountIdBond, SignerBond } from './AccountIdBond.jsx';
 import { BalanceBond } from './BalanceBond.jsx';

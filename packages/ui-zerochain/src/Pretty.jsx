@@ -1,6 +1,6 @@
 import React from 'react';
 import { ReactiveComponent } from 'oo7-react';
-import { pretty } from 'oo7-substrate';
+import { pretty } from 'oo7-zerochain';
 
 export class Pretty extends ReactiveComponent {
 	constructor () {

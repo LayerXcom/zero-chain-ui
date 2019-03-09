@@ -1,7 +1,7 @@
 const React = require('react');
 const {Bond} = require('oo7');
 const {ReactiveComponent} = require('oo7-react');
-const {post} = require('oo7-substrate');
+const {post} = require('oo7-zerochain');
 const {Button} = require('semantic-ui-react');
 const {TransactionProgressLabel, styleStatus} = require('./TransactionProgressLabel');
 

@@ -9,9 +9,9 @@
         "esdoc": "esdoc"
     },
     "devDependencies": {
-        "lerna": "^3.4.3",
         "esdoc": "^1.0.4",
         "esdoc-node": "^1.0.3",
-        "esdoc-standard-plugin": "^1.0.0"
+        "esdoc-standard-plugin": "^1.0.0",
+        "lerna": "^3.13.1"
     }
 }

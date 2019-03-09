@@ -5,7 +5,7 @@ const Identicon = require('polkadot-identicon').default;
 const {Label, Input} = require('semantic-ui-react');
 const {InputBond} = require('./InputBond');
 const nacl = require('tweetnacl');
-const {stringToSeed, hexToBytes, bytesToHex, runtime, secretStore, addressBook, ss58Decode, AccountId} = require('oo7-substrate');
+const {stringToSeed, hexToBytes, bytesToHex, runtime, secretStore, addressBook, ss58Decode, AccountId} = require('oo7-zerochain');
 
 class AccountIdBond extends InputBond {
 	constructor () { super() }

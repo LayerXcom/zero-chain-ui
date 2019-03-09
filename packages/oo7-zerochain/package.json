@@ -1,5 +1,5 @@
 {
-  "name": "oo7-substrate",
+  "name": "oo7-zerochain",
   "version": "0.5.0",
   "description": "Substrate Bonds library",
   "main": "src/index.js",

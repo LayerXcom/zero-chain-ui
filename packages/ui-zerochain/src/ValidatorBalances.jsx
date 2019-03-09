@@ -1,5 +1,5 @@
 import { ReactiveComponent } from 'oo7-react';
-import { pretty } from 'oo7-substrate';
+import { pretty } from 'oo7-zerochain';
 import Identicon from 'polkadot-identicon';
 
 export class ValidatorBalances extends ReactiveComponent {

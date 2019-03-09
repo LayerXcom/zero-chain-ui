@@ -1,7 +1,7 @@
 import React from 'react';
 import {List, Icon, Button, Label, Popup} from 'semantic-ui-react';
 import {ReactiveComponent} from 'oo7-react';
-import {runtime, secretStore} from 'oo7-substrate';
+import {runtime, secretStore} from 'oo7-zerochain';
 import Identicon from 'polkadot-identicon';
 
 export class SecretItem extends ReactiveComponent {

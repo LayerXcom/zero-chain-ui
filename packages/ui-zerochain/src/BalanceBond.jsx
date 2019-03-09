@@ -1,7 +1,7 @@
 const React = require('react')
 const {Dropdown} = require('semantic-ui-react')
 const {InputBond} = require('./InputBond')
-const {denominations, denominationInfo} = require('oo7-substrate').denominationInfo
+const {denominations, denominationInfo} = require('oo7-zerochain').denominationInfo
 
 function formatValueNoDenom(n) {
 	return `${n.units.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1,')}${n.decimals ? '.' + n.decimals : ''}`

@@ -1,7 +1,7 @@
 import React from 'react';
 import {List, Button} from 'semantic-ui-react';
 import {ReactiveComponent} from 'oo7-react';
-import {runtime, addressBook} from 'oo7-substrate';
+import {runtime, addressBook} from 'oo7-zerochain';
 import Identicon from 'polkadot-identicon';
 
 export class AddressBookList extends ReactiveComponent {

@@ -2,7 +2,7 @@ const React = require('react');
 const { Icon, Label } = require('semantic-ui-react');
 
 import { ReactiveComponent } from 'oo7-react';
-import { runtime } from 'oo7-substrate';
+import { runtime } from 'oo7-zerochain';
 
 export class StakingStatusLabel extends ReactiveComponent {
 	constructor () {
