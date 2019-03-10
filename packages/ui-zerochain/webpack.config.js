@@ -1,7 +1,7 @@
 // webpack v4
 const path = require('path');
 module.exports = {
-  entry: { main: './src/index.js' },
+  entry: { main: './src/bootstrap.js' },
   module: {
     rules: [
       {
