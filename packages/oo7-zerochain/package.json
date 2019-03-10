@@ -36,11 +36,15 @@
     "text-encoding-polyfill": "^0.6.7",
     "tweetnacl": "^1.0.0",
     "ws": "^6.1.2",
-    "xxhashjs": "^0.2.2"
+    "xxhashjs": "^0.2.2",
+    "zerochain-wasm-utils": "0.1.2",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5",
+    "copy-webpack-plugin": "^5.0.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "mocha": "^5.2.0"
-  },
-  "gitHead": "c2608abd7bca953cdb058053b35b105a9ecf0d5a"
+  }
 }

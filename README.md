@@ -2,6 +2,7 @@
 
 This repository is a monorepo for Zerochain UI.
 Zerochain is a privacy oriented blockchain on substarte.
+
 See here:
 https://github.com/LayerXcom/zero-chain
 
