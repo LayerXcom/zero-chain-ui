@@ -10,11 +10,7 @@ module.exports = {
         use: [
           {
             loader: 'babel-loader',
-          options: {
-            presets: [
-              '@babel/preset-env',
-              '@babel/react'
-            ],
+          options: {            
             plugins: ["@babel/plugin-syntax-dynamic-import"]
           }
         }
@@ -40,6 +36,6 @@ module.exports = {
   },
   devServer: {
     contentBase: './dist'
-  }
-  // target: 'node'
+  },  
+  node: { global: true, fs: 'empty' }
 };

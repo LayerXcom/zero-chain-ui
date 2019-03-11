@@ -1,4 +1,5 @@
-const { setNetworkDefault, denominationInfo: { init } } = require('oo7-zerochain')
+// const { setNetworkDefault, denominationInfo: { init } } = require('oo7-zerochain')
+import {setNetworkDefault, denominationInfo } from 'oo7-zerochain';
 /*
 init({
 	denominations: {

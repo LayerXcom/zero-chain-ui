@@ -1,23 +1,23 @@
 import React from 'react';
-require('semantic-ui-css/semantic.min.css');
-const { generateMnemonic } = require('bip39')
+import 'semantic-ui-css/semantic.min.css';
+import { generateMnemonic } from 'bip39';
 import { Icon, List, Label, Header, Segment, Divider, Button } from 'semantic-ui-react';
 import { Bond, TransformBond } from 'oo7';
 import { ReactiveComponent, If, Rspan } from 'oo7-react';
 import { calls, runtime, chain, system, runtimeUp, ss58Encode, addressBook, secretStore, addCodecTransform, encode, decode } from 'oo7-zerochain';
 import Identicon from 'polkadot-identicon';
 import { AccountIdBond, SignerBond } from './AccountIdBond.jsx';
-import { BalanceBond } from './BalanceBond.jsx';
-import { InputBond } from './InputBond.jsx';
-import { TransactButton } from './TransactButton.jsx';
-import { FileUploadBond } from './FileUploadBond.jsx';
-import { StakingStatusLabel } from './StakingStatusLabel';
+// import BalanceBond from './BalanceBond.jsx';
+import InputBond from './InputBond.jsx';
+import TransactButton from './TransactButton.jsx';
+import FileUploadBond from './FileUploadBond.jsx';
+import StakingStatusLabel from './StakingStatusLabel';
 import { WalletList, SecretItem } from './WalletList';
-import { AddressBookList } from './AddressBookList';
-import { TransformBondButton } from './TransformBondButton';
-import { Pretty } from './Pretty';
+import AddressBookList from './AddressBookList';
+import TransformBondButton from './TransformBondButton';
+import Pretty from './Pretty';
 
-export class App extends ReactiveComponent {
+export default class App extends ReactiveComponent {
 	constructor() {
 		super([], { ensureRuntime: runtimeUp })
 
@@ -211,10 +211,10 @@ export class App extends ReactiveComponent {
 						</Label>
 					} />
 				</div>
-				<div style={{ paddingBottom: '1em' }}>
+				{/* <div style={{ paddingBottom: '1em' }}>
 					<div style={{ fontSize: 'small' }}>amount</div>
 					<BalanceBond bond={this.amount} />
-				</div>
+				</div> */}
 				<TransactButton
 					content="Send"
 					icon='send'
