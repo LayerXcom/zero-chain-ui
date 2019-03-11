@@ -48,6 +48,7 @@ export default class App extends ReactiveComponent {
 		this.valueRecipient = new Bond;
 		this.balanceSender = new Bond;
 		this.rk = new Bond;
+		this.zAddr = new Bond;
 
 		addCodecTransform(
 			'PreparedVk', 'Vec<u8>'
@@ -289,7 +290,23 @@ export default class App extends ReactiveComponent {
 						Confidential transfer
 						<Header.Subheader>Confidential transfer</Header.Subheader>
 					</Header.Content>
-				</Header>				
+				</Header>	
+				<div style={{ paddingBottom: '1em' }}>
+					<div style={{ fontSize: 'small' }}>from</div>
+					<SignerBond bond={this.zAddr} />
+					<If condition={this.zAddr.ready()} then={<span>
+						<Label>Balance
+							<Label.Detail>
+								<Pretty value={runtime.balances.balance(this.zAddr)} />
+							</Label.Detail>
+						</Label>
+						<Label>Nonce
+							<Label.Detail>
+								<Pretty value={runtime.system.accountNonce(this.zAddr)} />
+							</Label.Detail>
+						</Label>
+					</span>} />
+				</div>			
 				<div style={{ fontSize: 'small' }}>Proof (192 bytes)</div>
 				<InputBond bond={this.proof} validator={n => n || null} placeholder='0x...' />
 				<div style={{ fontSize: 'small' }}>From</div>
@@ -308,7 +325,7 @@ export default class App extends ReactiveComponent {
 					content="Confidential transfer"
 					icon='send'
 					tx={{
-						sender: this.rk,
+						sender: this.zAddr,
 						call: calls.confTransfer.confidentialTransfer(
 							this.proof,
 							this.addressSender,

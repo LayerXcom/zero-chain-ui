@@ -41,10 +41,13 @@ class SecretStore extends Bond {
 	}
 
 	find (identifier) {
-		if (this._keys.indexOf(identifier) !== -1) {
+		console.log(`tmp1: ${identifier}`)
+		if (this._keys.indexOf(identifier) !== -1) {					
 			return identifier
 		}
 		if (identifier instanceof Uint8Array && identifier.length == 32 || identifier instanceof AccountId) {
+			identifier = new AccountId(identifier)
+			console.log(`tmp2: ${identifier}`)
 			identifier = ss58Encode(identifier)
 		}
 		return this._byAddress[identifier] ? this._byAddress[identifier] : this._byName[identifier]
@@ -52,6 +55,7 @@ class SecretStore extends Bond {
 
 	sign (from, data) {
 		let item = this.find(from)
+		console.log(`item: ${item}`)
 		if (item) {
 			console.info(`Signing data from ${item.name}`, bytesToHex(data))
 			// let sig = nacl.sign.detached(data, item.key.secretKey)
@@ -96,8 +100,9 @@ class SecretStore extends Bond {
 		let byName = {}
 		this._keys = this._keys.map(({seed, phrase, name, key}) => {
 			seed = seed || seedFromPhrase(phrase)
-			// key = key || nacl.sign.keyPair.fromSeed(seed)
+			// key = key || nacl.sign.keyPair.fromSeed(seed)			
 			key = key || gen_account_id(seed)
+			console.log(`key: ${key}`)
 			let account = new AccountId(key)
 			let address = ss58Encode(account)
 			let item = {seed, phrase, name, key, account, address}

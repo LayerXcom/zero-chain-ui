@@ -522,7 +522,9 @@ function encode(value, type = null) {
 	}
 
 	if (value instanceof Uint8Array) {
+		console.log(`value:${value}`)
 		if (type == 'Signature' && value.length == 64) {
+			console.log(`value:${value}`)
 			return value
 		}
 		if (type == 'Hash' && value.length == 32) {

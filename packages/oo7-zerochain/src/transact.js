@@ -5,7 +5,7 @@ const { encode } = require('./codec')
 const { secretStore } = require('./secretStore')
 const { TransactionEra, AccountIndex } = require('./types')
 const { runtimeUp, runtime, chain } = require('./bonds')
-const { bytesToHex } = require('./utils')
+const { bytesToHex, hexToBytes } = require('./utils')
 
 class TransactionBond extends SubscriptionBond {
 	constructor (data) {
@@ -13,12 +13,19 @@ class TransactionBond extends SubscriptionBond {
 	}
 }
 
+const fromHexString = hexString =>
+	new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+
 function composeTransaction (sender, call, index, era, checkpoint, senderAccount, compact) {
 	return new Promise((resolve, reject) => {
+		console.log(`sender: ${sender}`)
+		// let sender_b = Uint8Array.from(Buffer.from(sender, "hex"))
+		// let sender_u8 = hexToBytes(sender)
+		console.log(sender)
 		if (typeof sender == 'string') {
 			sender = ss58Decode(sender)
-		}
-		if (sender instanceof Uint8Array && sender.length == 32) {
+		}				
+		if (sender instanceof Uint8Array && sender.length == 32) {			
 			senderAccount = sender
 		} else if (!senderAccount) {
 			reject(`Invalid senderAccount when sender is account index`)
@@ -39,7 +46,10 @@ function composeTransaction (sender, call, index, era, checkpoint, senderAccount
 			e = blake2b(e, null, 32)
 		}
 	
+		console.log(`sigdata: ${senderAccount}, ${e}`)
 		let signature = secretStore().sign(senderAccount, e)
+		signature = Uint8Array.from(signature)
+		console.log(signature)
 		console.log("encoding transaction", sender, index, era, call);
 		let signedData = encode(encode({
 			_type: 'Transaction',
