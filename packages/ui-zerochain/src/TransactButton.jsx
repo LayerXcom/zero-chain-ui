@@ -11,6 +11,11 @@ export default class TransactButton extends ReactiveComponent {
 		this.state = { index: 0, status: null };
 		this.handleClick = this.handleClick.bind(this);
 	}
+
+	// gen_proof() {
+
+	// }
+
 	handleClick () {
 		let begin = false;
 		let s = this.state;
@@ -26,14 +31,19 @@ export default class TransactButton extends ReactiveComponent {
 			this.execNext();
 		}
 	}
+
 	execNext () {
 		let s = this.state;
 		let single = typeof(this.props.tx) === 'function' || this.props.tx.length === undefined;
 		if ((single && s.index === 0) || s.index < this.props.tx.length) {
 			let t = single ? this.props.tx : this.props.tx[s.index];
-			s.status = typeof(t) === 'function'
-				? t()
-				: post(t);
+			if (typeof(t) === 'function') {				
+				s.status = t()
+			} else {
+				// this.gen_proof()
+				console.log(t)
+				s.status = post(t)
+			}				
 			s.status.tie((x, i) => {
 				if (this.props.order ? this.props.causal ? x.confirmed || x.scheduled : x.signed : x.requested) {
 					this.execNext();

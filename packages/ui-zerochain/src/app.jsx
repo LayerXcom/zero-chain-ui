@@ -4,7 +4,7 @@ import { generateMnemonic } from 'bip39';
 import { Icon, List, Label, Header, Segment, Divider, Button } from 'semantic-ui-react';
 import { Bond, TransformBond } from 'oo7';
 import { ReactiveComponent, If, Rspan } from 'oo7-react';
-import { calls, runtime, chain, system, runtimeUp, ss58Encode, addressBook, secretStore, addCodecTransform, encode, decode } from 'oo7-zerochain';
+import { calls, runtime, chain, system, runtimeUp, ss58Decode, ss58Encode, addressBook, secretStore, addCodecTransform, encode, decode, hexToBytes, bytesToHex } from 'oo7-zerochain';
 import Identicon from 'polkadot-identicon';
 import { AccountIdBond, SignerBond } from './AccountIdBond.jsx';
 // import BalanceBond from './BalanceBond.jsx';
@@ -16,6 +16,7 @@ import { WalletList, SecretItem } from './WalletList';
 import AddressBookList from './AddressBookList';
 import TransformBondButton from './TransformBondButton';
 import Pretty from './Pretty';
+import { decrypt, decrypt_ca } from 'zerochain-wasm-utils';
 
 export default class App extends ReactiveComponent {
 	constructor() {
@@ -49,6 +50,11 @@ export default class App extends ReactiveComponent {
 		this.balanceSender = new Bond;
 		this.rk = new Bond;
 		this.zAddr = new Bond;
+		this.provingKey = new Bond;
+		this.encAddress = new Bond;
+		this.ivk = this.encAddress.map(v => v ? secretStore().getIvk(v) : undefined)
+		this.ivk.use()
+		this.params = new Bond;
 
 		addCodecTransform(
 			'PreparedVk', 'Vec<u8>'
@@ -177,7 +183,7 @@ export default class App extends ReactiveComponent {
 				</div>
 			</Segment>
 			<Divider hidden />
-			<Segment style={{ margin: '1em' }} padded>
+			{/* <Segment style={{ margin: '1em' }} padded>
 				<Header as='h2'>
 					<Icon name='send' />
 					<Header.Content>
@@ -212,10 +218,10 @@ export default class App extends ReactiveComponent {
 						</Label>
 					} />
 				</div>
-				{/* <div style={{ paddingBottom: '1em' }}>
+				<div style={{ paddingBottom: '1em' }}>
 					<div style={{ fontSize: 'small' }}>amount</div>
 					<BalanceBond bond={this.amount} />
-				</div> */}
+				</div>
 				<TransactButton
 					content="Send"
 					icon='send'
@@ -224,9 +230,9 @@ export default class App extends ReactiveComponent {
 						call: calls.balances.transfer(this.destination, this.amount)
 					}}
 				/>
-			</Segment>
+			</Segment> */}
 			<Divider hidden />
-			<Segment style={{ margin: '1em' }} padded>
+			{/* <Segment style={{ margin: '1em' }} padded>
 				<Header as='h2'>
 					<Icon name='search' />
 					<Header.Content>
@@ -245,42 +251,74 @@ export default class App extends ReactiveComponent {
 					}}
 				/>
 			</Segment>
-			<Divider hidden />
+			<Divider hidden /> */}
 			<Segment style={{ margin: '1em' }} padded>
 				<Header as='h2'>
-					<Icon name='search' />
+					<Icon name='send' />
 					<Header.Content>
-						Prepared Verifying Key
-						<Header.Subheader>Prepared Verifying Key</Header.Subheader>
+						Confidential transfer
+						<Header.Subheader>Confidential transfer</Header.Subheader>
 					</Header.Content>
 				</Header>
-				<Label>Encrypted Balance
+				<FileUploadBond bond={this.provingKey} content='Add Proving Key' />				
+				<Divider hidden />
+				<div style={{ fontSize: 'small' }}>From</div>
+				<SignerBond bond={this.encAddress} />
+				<If condition={this.encAddress.ready()} then={<span>
+					<Label>Decrypted Balance
+						<Label.Detail>
+							<Pretty value={
+								this.encAddress.map(v => runtime.confTransfer.encryptedBalance(v).map(e => decrypt_ca(e, secretStore().getIvk(v))))
+							} />
+						</Label.Detail>
+					</Label>
+					<Label>Encrypted Balance
 					<Label.Detail>
-						<Pretty value={runtime.confTransfer.encryptedBalance("0x416c696365202020202020202020202020202020202020202020202020202020")} />
-					</Label.Detail>
-				</Label>
+							{/* <Pretty value={runtime.confTransfer.encryptedBalance("0x416c696365202020202020202020202020202020202020202020202020202020").map(e => console.log(e))} />
+							<Divider hidden /> */}
+							<Pretty value={this.encAddress.map(e => runtime.confTransfer.encryptedBalance(e))} />
+							<Divider hidden />
+							<Pretty value={this.encAddress.map(e => secretStore().getIvk(e))} />
+							<Divider hidden />
+							<Pretty value={this.encAddress} />														
+						</Label.Detail>
+					</Label>										
+				</span>} />				
 				<div style={{ paddingBottom: '1em' }}></div>
-				<Label>Prepared vk
+				{/* <Label>Prepared vk
 					<Label.Detail>
 						<Pretty value={runtime.confTransfer.verifyingKey} />
 					</Label.Detail>
-				</Label>
+				</Label> */}
+				<Divider hidden />		
+				<div style={{ fontSize: 'small' }}>To</div>
+				<AccountIdBond bond={this.destination} />
+				<If condition={this.destination.ready()} then={
+					<Label>Encrypted Balance
+							<Label.Detail>
+							<Pretty value={runtime.confTransfer.encryptedBalance(this.destination)} />
+						</Label.Detail>
+					</Label>
+				} />
+				<div style={{ fontSize: 'small' }}>Amount</div>
 				<Divider hidden />
-				{/* <InputBond
-					bond={this.address}
-					reversible
-					placeholder='Address'
-					validator={n => n || null}
-					// action={<Button content="Another" onClick={() => this.seed.trigger(generateMnemonic())} />}
-					iconPosition='left'
-				// icon={<i style={{ opacity: 1 }} className='icon'><Identicon account={this.seedAccount} size={28} style={{ marginTop: '5px' }} /></i>}
-				/> */}
-				<Divider hidden />
-				<Label>Hash
-					<Label.Detail>
-						<Pretty value={runtime.confTransfer.h256} />
-					</Label.Detail>
-				</Label>
+				<TransactButton
+					content="Confidential transfer"
+					icon='send'
+					bond={this.params}
+					tx={{
+						sender: this.zAddr, // sig verification key
+						call: calls.confTransfer.confidentialTransfer(
+							this.proof,
+							this.addressSender,
+							this.addressRecipient,
+							this.valueSender,
+							this.valueRecipient,
+							this.balanceSender,
+							this.rk
+						)
+					}}
+				/>
 			</Segment>
 			<Divider hidden />
 			<Segment style={{ margin: '1em' }} padded>
@@ -291,6 +329,7 @@ export default class App extends ReactiveComponent {
 						<Header.Subheader>Confidential transfer</Header.Subheader>
 					</Header.Content>
 				</Header>	
+				<FileUploadBond bond={this.provingKey} content='Add Proving Key' />
 				<div style={{ paddingBottom: '1em' }}>
 					<div style={{ fontSize: 'small' }}>from</div>
 					<SignerBond bond={this.zAddr} />
@@ -325,7 +364,7 @@ export default class App extends ReactiveComponent {
 					content="Confidential transfer"
 					icon='send'
 					tx={{
-						sender: this.zAddr,
+						sender: this.zAddr, // sig verification key
 						call: calls.confTransfer.confidentialTransfer(
 							this.proof,
 							this.addressSender,

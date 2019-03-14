@@ -4,7 +4,7 @@ const { generateMnemonic, mnemonicToSeed } = require('bip39')
 const { ss58Encode } = require('./ss58')
 const { AccountId } = require('./types')
 const { bytesToHex, hexToBytes } = require('./utils')
-const { gen_account_id, sign } = require('zerochain-wasm-utils')
+const { gen_account_id, sign, gen_ivk, verify } = require('zerochain-wasm-utils')
 
 let cache = {}
 
@@ -23,6 +23,7 @@ class SecretStore extends Bond {
 		this._storage = storage || typeof localStorage === 'undefined' ? {} : localStorage
 		this._keys = []
 		this._load()
+		this.getIvk()
 	}
 
 	submit (phrase, name) {
@@ -34,23 +35,34 @@ class SecretStore extends Bond {
 	accountFromPhrase (phrase) {
 		// return new AccountId(nacl.sign.keyPair.fromSeed(seedFromPhrase(phrase)).publicKey)
 		return new AccountId(gen_account_id((seedFromPhrase(phrase))))
-	}
+	}	
 
 	accounts () {
 		return this._keys.map(k => k.account)
 	}
 
 	find (identifier) {
-		console.log(`tmp1: ${identifier}`)
+		// console.log(`tmp1: ${identifier}`)
 		if (this._keys.indexOf(identifier) !== -1) {					
 			return identifier
 		}
 		if (identifier instanceof Uint8Array && identifier.length == 32 || identifier instanceof AccountId) {
 			identifier = new AccountId(identifier)
-			console.log(`tmp2: ${identifier}`)
+			// console.log(`tmp2: ${identifier}`)
 			identifier = ss58Encode(identifier)
 		}
 		return this._byAddress[identifier] ? this._byAddress[identifier] : this._byName[identifier]
+	}
+
+	getIvk(who) {		
+		let item = this.find(who)
+		if (item) {			
+			let ivk = gen_ivk(item.seed)
+			console.log(Uint8Array.from(ivk))
+			return Uint8Array.from(ivk)
+		}
+		console.log("c!")
+		return null
 	}
 
 	sign (from, data) {
@@ -61,12 +73,12 @@ class SecretStore extends Bond {
 			// let sig = nacl.sign.detached(data, item.key.secretKey)
 			let seed = new Uint32Array(8);
 			self.crypto.getRandomValues(seed);
-			let sig = sign(item.seed, data, seed)
+			let sig = sign(item.seed, data, seed)  // Change item.seed to ask
 			console.info(`Signature is ${bytesToHex(sig)}`)
-			// if (!nacl.sign.detached.verify(data, sig, item.key.publicKey)) {
-			// 	console.warn(`Signature is INVALID!`)
-			// 	return null
-			// }
+			if (!verify(item.key, data, sig)) {   // Change item.key to rk
+				console.warn(`Signature is INVALID!`)
+				return null
+			}
 			return sig
 		}
 		return null
@@ -102,7 +114,7 @@ class SecretStore extends Bond {
 			seed = seed || seedFromPhrase(phrase)
 			// key = key || nacl.sign.keyPair.fromSeed(seed)			
 			key = key || gen_account_id(seed)
-			console.log(`key: ${key}`)
+			// console.log(`key: ${key}`)			
 			let account = new AccountId(key)
 			let address = ss58Encode(account)
 			let item = {seed, phrase, name, key, account, address}

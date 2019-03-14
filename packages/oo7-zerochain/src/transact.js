@@ -74,6 +74,12 @@ function composeTransaction (sender, call, index, era, checkpoint, senderAccount
 function post(tx) {
 	return Bond.all([tx, chain.height, runtimeUp]).map(([o, height, unused]) => {
 		let {sender, call, index, longevity, compact} = o
+		console.log("HERE!!")
+		console.log(o)
+		console.log(sender)
+		console.log(call)
+		console.log(longevity)
+		console.log(compact)
 		// defaults
 		longevity = typeof longevity === 'undefined' ? 256 : longevity
 		compact = typeof compact === 'undefined' ? true : compact
