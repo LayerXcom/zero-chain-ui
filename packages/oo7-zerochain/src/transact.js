@@ -6,6 +6,7 @@ const { secretStore } = require('./secretStore')
 const { TransactionEra, AccountIndex } = require('./types')
 const { runtimeUp, runtime, chain } = require('./bonds')
 const { bytesToHex, hexToBytes } = require('./utils')
+const { gen_account_id, sign, gen_ivk, gen_call} = require('zerochain-wasm-utils')
 
 class TransactionBond extends SubscriptionBond {
 	constructor (data) {
@@ -50,6 +51,7 @@ function composeTransaction (sender, call, index, era, checkpoint, senderAccount
 		let signature = secretStore().sign(senderAccount, e)
 		signature = Uint8Array.from(signature)
 		console.log(signature)
+		sender = hexToBytes("0x791b91fae07feada7b6f6042b1e214bc75759b3921956053936c38a95271a834");
 		console.log("encoding transaction", sender, index, era, call);
 		let signedData = encode(encode({
 			_type: 'Transaction',
@@ -73,13 +75,22 @@ function composeTransaction (sender, call, index, era, checkpoint, senderAccount
 // }
 function post(tx) {
 	return Bond.all([tx, chain.height, runtimeUp]).map(([o, height, unused]) => {
-		let {sender, call, index, longevity, compact} = o
+		let {sender, call, index, longevity, compact} = o		
 		console.log("HERE!!")
 		console.log(o)
 		console.log(sender)
+		console.log(index)
 		console.log(call)
 		console.log(longevity)
 		console.log(compact)
+
+		// let sk = secretStore().seedFromAccount(sender)
+		// let randomSeed = new Uint32Array(8)
+		// self.crypto.getRandomValues(randomSeed)
+		// let addressRecipient = 
+
+		// let args = gen_call()
+
 		// defaults
 		longevity = typeof longevity === 'undefined' ? 256 : longevity
 		compact = typeof compact === 'undefined' ? true : compact

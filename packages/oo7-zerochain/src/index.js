@@ -10,7 +10,7 @@ const { stringToSeed, stringToBytes, hexToBytes, bytesToHex, toLEHex, toLE, leTo
 const { storageKey } = require('./storageBond')
 const { initRuntime, runtime, calls, runtimePromise, callsPromise, chain, system, state, runtimeUp } = require('./bonds')
 const { nodeService, setNodeUri } = require('./nodeService')
-const denominationInfo = require('./denominationInfo')
+const { init, denominationInfo, denominations } = require('./denominationInfo')
 const { metadata } = require('./metadata')
 
 function tally(x) {
@@ -60,7 +60,7 @@ module.exports = {
 	pretty, encode, decode, addCodecTransform,
 	secretStore, addressBook,
 	post,
-	denominationInfo,
+	init, denominationInfo, denominations,
 	nodeService, setNodeUri,
 	metadata,
 	// bonds

@@ -32,10 +32,17 @@ class SecretStore extends Bond {
 		return this.accountFromPhrase(phrase)
 	}
 
-	accountFromPhrase (phrase) {
-		// return new AccountId(nacl.sign.keyPair.fromSeed(seedFromPhrase(phrase)).publicKey)
+	accountFromPhrase (phrase) {		
 		return new AccountId(gen_account_id((seedFromPhrase(phrase))))
 	}	
+
+	seedFromAccount (account) {
+		let item = this.find(account)
+		if (item) {
+			return item.seed
+		}
+		return null
+	}
 
 	accounts () {
 		return this._keys.map(k => k.account)
@@ -73,9 +80,12 @@ class SecretStore extends Bond {
 			// let sig = nacl.sign.detached(data, item.key.secretKey)
 			let seed = new Uint32Array(8);
 			self.crypto.getRandomValues(seed);
-			let sig = sign(item.seed, data, seed)  // Change item.seed to ask
+			// let sig = sign(item.seed, data, seed)  // Change item.seed to ask
+			let rsk = hexToBytes("0xdcfd7a3cb8291764a4e1ab41f6831d2e285a98114cdc4a2d361a380de0e3cb07")
+			let rvk = hexToBytes("0x791b91fae07feada7b6f6042b1e214bc75759b3921956053936c38a95271a834")
+			let sig = sign(rsk, data, seed)  // Change item.seed to ask
 			console.info(`Signature is ${bytesToHex(sig)}`)
-			if (!verify(item.key, data, sig)) {   // Change item.key to rk
+			if (!verify(rvk, data, sig)) {   // Change item.key to rk
 				console.warn(`Signature is INVALID!`)
 				return null
 			}
