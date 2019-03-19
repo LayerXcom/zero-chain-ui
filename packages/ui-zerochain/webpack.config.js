@@ -7,7 +7,14 @@ module.exports = {
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        use: [
+          {
+            loader: 'babel-loader',
+          options: {            
+            plugins: ["@babel/plugin-syntax-dynamic-import"]
+          }
+        }
+      ]
       },
       {
         test: /\.css$/,
@@ -29,5 +36,6 @@ module.exports = {
   },
   devServer: {
     contentBase: './dist'
-  }
+  },  
+  node: { global: true, fs: 'empty' }
 };

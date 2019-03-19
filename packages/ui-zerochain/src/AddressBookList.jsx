@@ -4,7 +4,7 @@ import {ReactiveComponent} from 'oo7-react';
 import {runtime, addressBook} from 'oo7-zerochain';
 import Identicon from 'polkadot-identicon';
 
-export class AddressBookList extends ReactiveComponent {
+export default class AddressBookList extends ReactiveComponent {
 	constructor () {
 		super([], {
 			addressBook: addressBook(),

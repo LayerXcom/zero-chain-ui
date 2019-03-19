@@ -4,7 +4,7 @@ const { Icon, Label } = require('semantic-ui-react');
 import { ReactiveComponent } from 'oo7-react';
 import { runtime } from 'oo7-zerochain';
 
-export class StakingStatusLabel extends ReactiveComponent {
+export default class StakingStatusLabel extends ReactiveComponent {
 	constructor () {
 		super (['id'], {
 			intentionIndex: ({id}) => runtime.staking.intentionIndexOf(id),

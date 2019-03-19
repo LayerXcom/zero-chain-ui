@@ -4,7 +4,7 @@ import {Bond} from 'oo7';
 import {ReactiveComponent} from 'oo7-react';
 import * as uuid from 'uuid';
 
-export class FileUploadBond extends ReactiveComponent {
+export default class FileUploadBond extends ReactiveComponent {
 	constructor () {
 		super(['content', 'disabled']);
 

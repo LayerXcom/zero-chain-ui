@@ -5,7 +5,8 @@ const { encode } = require('./codec')
 const { secretStore } = require('./secretStore')
 const { TransactionEra, AccountIndex } = require('./types')
 const { runtimeUp, runtime, chain } = require('./bonds')
-const { bytesToHex } = require('./utils')
+const { bytesToHex, hexToBytes } = require('./utils')
+const { gen_account_id, sign, gen_ivk, gen_call} = require('zerochain-wasm-utils')
 
 class TransactionBond extends SubscriptionBond {
 	constructor (data) {
@@ -13,12 +14,15 @@ class TransactionBond extends SubscriptionBond {
 	}
 }
 
+const fromHexString = hexString =>
+	new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+
 function composeTransaction (sender, call, index, era, checkpoint, senderAccount, compact) {
-	return new Promise((resolve, reject) => {
+	return new Promise((resolve, reject) => {				
 		if (typeof sender == 'string') {
 			sender = ss58Decode(sender)
-		}
-		if (sender instanceof Uint8Array && sender.length == 32) {
+		}				
+		if (sender instanceof Uint8Array && sender.length == 32) {			
 			senderAccount = sender
 		} else if (!senderAccount) {
 			reject(`Invalid senderAccount when sender is account index`)
@@ -38,13 +42,16 @@ function composeTransaction (sender, call, index, era, checkpoint, senderAccount
 			console.log(`Oversize transaction (length ${e.length} bytes). Hashing.`)
 			e = blake2b(e, null, 32)
 		}
-	
-		let signature = secretStore().sign(senderAccount, e)
-		console.log("encoding transaction", sender, index, era, call);
+			
+		let [signature, sender_rvk] = secretStore().sign(senderAccount, e)
+		signature = Uint8Array.from(signature)	
+		sender_rvk = new AccountId(sender_rvk)	
+		
+		console.log("encoding transaction", sender_rvk, index, era, call);
 		let signedData = encode(encode({
 			_type: 'Transaction',
 			version: 0x81,
-			sender,
+			sender: sender_rvk,
 			signature,
 			index,
 			era,
@@ -63,7 +70,15 @@ function composeTransaction (sender, call, index, era, checkpoint, senderAccount
 // }
 function post(tx) {
 	return Bond.all([tx, chain.height, runtimeUp]).map(([o, height, unused]) => {
-		let {sender, call, index, longevity, compact} = o
+		let {sender, call, index, longevity, compact} = o				
+
+		// let sk = secretStore().seedFromAccount(sender)
+		// let randomSeed = new Uint32Array(8)
+		// self.crypto.getRandomValues(randomSeed)
+		// let addressRecipient = 
+
+		// let args = gen_call()
+
 		// defaults
 		longevity = typeof longevity === 'undefined' ? 256 : longevity
 		compact = typeof compact === 'undefined' ? true : compact
@@ -92,13 +107,13 @@ function post(tx) {
 			let phase = eraNumber % period
 			era = new TransactionEra(period, phase)
 			eraHash = chain.hash(eraNumber)
-		}
+		}		
 		return {
 			sender,
 			call,
 			era,
 			eraHash,
-			index: index || runtime.system.accountNonce(senderAccount),
+			index: index,
 			senderAccount,
 			compact
 		}

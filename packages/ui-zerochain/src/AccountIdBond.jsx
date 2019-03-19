@@ -1,13 +1,13 @@
-const React = require('react');
-const {Bond} = require('oo7');
-const {ReactiveComponent, Rimg} = require('oo7-react');
-const Identicon = require('polkadot-identicon').default;
-const {Label, Input} = require('semantic-ui-react');
-const {InputBond} = require('./InputBond');
-const nacl = require('tweetnacl');
-const {stringToSeed, hexToBytes, bytesToHex, runtime, secretStore, addressBook, ss58Decode, AccountId} = require('oo7-zerochain');
+import React from 'react';
+import {Bond} from 'oo7';
+import {ReactiveComponent, Rimg} from 'oo7-react';
+import Identicon from 'polkadot-identicon'; // default
+import {Label, Input} from 'semantic-ui-react';
+import InputBond from './InputBond';
+import nacl from 'tweetnacl';
+import {stringToSeed, hexToBytes, bytesToHex, runtime, secretStore, addressBook, ss58Decode, AccountId} from 'oo7-zerochain';
 
-class AccountIdBond extends InputBond {
+export class AccountIdBond extends InputBond {
 	constructor () { super() }
 	makeIcon (p) {
 		return p ? 'left' : this.state.ok
@@ -49,7 +49,7 @@ AccountIdBond.defaultProps = {
 	defaultValue: ''
 };
 
-class SignerBond extends AccountIdBond {
+export class SignerBond extends AccountIdBond {
 	constructor () { super() }
 }
 
@@ -69,5 +69,3 @@ SignerBond.defaultProps = {
 	},
 	defaultValue: ''
 };
-
-module.exports = { AccountIdBond, SignerBond };

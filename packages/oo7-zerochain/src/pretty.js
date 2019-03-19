@@ -75,7 +75,7 @@ function pretty(expr) {
 	}
 	if (expr instanceof VecU8 || expr instanceof Uint8Array) {
 		if (expr.length <= 256) {
-			return '[' + bytesToHex(expr) + ']';
+			return "0x" + bytesToHex(expr) ;
 		} else {
 			return `[${bytesToHex(expr.slice(0, 256))}...] (${expr.length} bytes)`;
 		}
