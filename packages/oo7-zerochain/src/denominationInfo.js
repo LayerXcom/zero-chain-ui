@@ -2,12 +2,12 @@ const { siPrefix } = require('./utils')
 
 let denominationInfo = {
 	denominations: { unit: 0 },
-	primary: 'unit',
-	unit: 'unit',
-	ticker: 'UNIT'
+	primary: 'coin',
+	unit: 'coin',
+	ticker: 'COIN'
 }
 
-let denominations = [ 'unit' ]
+let denominations = [ 'coin' ]
 
 function init (di) {
 	if (!di.denominations[di.primary]) {

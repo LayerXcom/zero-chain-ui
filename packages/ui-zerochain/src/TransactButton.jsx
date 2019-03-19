@@ -37,11 +37,9 @@ export default class TransactButton extends ReactiveComponent {
 		let single = typeof(this.props.tx) === 'function' || this.props.tx.length === undefined;
 		if ((single && s.index === 0) || s.index < this.props.tx.length) {
 			let t = single ? this.props.tx : this.props.tx[s.index];
-			if (typeof(t) === 'function') {				
-				s.status = t()
-			} else {
-				// this.gen_proof()
-				console.log(t)
+			if (typeof(t) === 'function') {								
+				s.status = t()				
+			} else {							
 				s.status = post(t)
 			}				
 			s.status.tie((x, i) => {

@@ -18,11 +18,7 @@ const fromHexString = hexString =>
 	new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
 
 function composeTransaction (sender, call, index, era, checkpoint, senderAccount, compact) {
-	return new Promise((resolve, reject) => {
-		console.log(`sender: ${sender}`)
-		// let sender_b = Uint8Array.from(Buffer.from(sender, "hex"))
-		// let sender_u8 = hexToBytes(sender)
-		console.log(sender)
+	return new Promise((resolve, reject) => {				
 		if (typeof sender == 'string') {
 			sender = ss58Decode(sender)
 		}				
@@ -46,17 +42,21 @@ function composeTransaction (sender, call, index, era, checkpoint, senderAccount
 			console.log(`Oversize transaction (length ${e.length} bytes). Hashing.`)
 			e = blake2b(e, null, 32)
 		}
-	
-		console.log(`sigdata: ${senderAccount}, ${e}`)
-		let signature = secretStore().sign(senderAccount, e)
-		signature = Uint8Array.from(signature)
-		console.log(signature)
-		sender = hexToBytes("0x791b91fae07feada7b6f6042b1e214bc75759b3921956053936c38a95271a834");
-		console.log("encoding transaction", sender, index, era, call);
+			
+		let [signature, sender_rvk] = secretStore().sign(senderAccount, e)
+		signature = Uint8Array.from(signature)	
+		sender_rvk = new AccountId(sender_rvk)	
+		// console.log(sender) 
+		// sender = hexToBytes("0x791b91fae07feada7b6f6042b1e214bc75759b3921956053936c38a95271a834");
+		// sender = secretStore().rvkFromAccount(sender)
+		console.log("HERE!!!")
+		console.log(sender_rvk)
+		console.log(sender)
+		console.log("encoding transaction", sender_rvk, index, era, call);
 		let signedData = encode(encode({
 			_type: 'Transaction',
 			version: 0x81,
-			sender,
+			sender: sender_rvk,
 			signature,
 			index,
 			era,
@@ -76,13 +76,10 @@ function composeTransaction (sender, call, index, era, checkpoint, senderAccount
 function post(tx) {
 	return Bond.all([tx, chain.height, runtimeUp]).map(([o, height, unused]) => {
 		let {sender, call, index, longevity, compact} = o		
-		console.log("HERE!!")
-		console.log(o)
+
+		console.log("here!!")
 		console.log(sender)
-		console.log(index)
 		console.log(call)
-		console.log(longevity)
-		console.log(compact)
 
 		// let sk = secretStore().seedFromAccount(sender)
 		// let randomSeed = new Uint32Array(8)
@@ -119,13 +116,13 @@ function post(tx) {
 			let phase = eraNumber % period
 			era = new TransactionEra(period, phase)
 			eraHash = chain.hash(eraNumber)
-		}
+		}		
 		return {
 			sender,
 			call,
 			era,
 			eraHash,
-			index: index || runtime.system.accountNonce(senderAccount),
+			index: index,
 			senderAccount,
 			compact
 		}

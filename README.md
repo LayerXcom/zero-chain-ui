@@ -16,3 +16,9 @@ Then install dependencies
 ```
 yarn install
 ```
+
+## Running
+```
+cd packages/ui-zerochain
+yarn run dev
+```
