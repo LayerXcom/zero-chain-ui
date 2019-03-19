@@ -1,4 +1,5 @@
 const { setNetworkDefault, denominationInfo: { init } } = require('oo7-zerochain')
+
 /*
 init({
 	denominations: {
@@ -9,6 +10,7 @@ init({
 	ticker: 'BBQ'
 })
 */
+
 setNetworkDefault(42)
 
 /*const denominationInfoDOT = {

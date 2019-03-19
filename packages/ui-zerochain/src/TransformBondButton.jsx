@@ -3,7 +3,7 @@ import {Button} from 'semantic-ui-react';
 import {Bond} from 'oo7';
 import {ReactiveComponent} from 'oo7-react';
 
-export class TransformBondButton extends ReactiveComponent {
+export default class TransformBondButton extends ReactiveComponent {
 	constructor () {
 		super (['content', 'disabled', 'icon'])
 

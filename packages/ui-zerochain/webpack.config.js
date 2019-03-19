@@ -1,13 +1,20 @@
 // webpack v4
 const path = require('path');
 module.exports = {
-  entry: { main: './src/index.js' },
+  entry: { main: './src/bootstrap.js' },
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        use: [
+          {
+            loader: 'babel-loader',
+          options: {            
+            plugins: ["@babel/plugin-syntax-dynamic-import"]
+          }
+        }
+      ]
       },
       {
         test: /\.css$/,
@@ -29,5 +36,6 @@ module.exports = {
   },
   devServer: {
     contentBase: './dist'
-  }
+  },  
+  node: { global: true, fs: 'empty' }
 };

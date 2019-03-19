@@ -2,6 +2,7 @@
 
 This repository is a monorepo for Zerochain UI.
 Zerochain is a privacy oriented blockchain on substarte.
+
 See here:
 https://github.com/LayerXcom/zero-chain
 
@@ -14,4 +15,10 @@ brew install yarn
 Then install dependencies
 ```
 yarn install
+```
+
+## Running
+```
+cd packages/ui-zerochain
+yarn run dev
 ```

@@ -1,7 +1,7 @@
-const React = require('react')
-const {Dropdown} = require('semantic-ui-react')
-const {InputBond} = require('./InputBond')
-const {denominations, denominationInfo} = require('oo7-zerochain').denominationInfo
+import React from 'react';
+import {Dropdown} from 'semantic-ui-react';
+import InputBond from './InputBond';
+import {denominations, denominationInfo} from 'oo7-zerochain';
 
 function formatValueNoDenom(n) {
 	return `${n.units.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1,')}${n.decimals ? '.' + n.decimals : ''}`
@@ -40,7 +40,7 @@ function interpretRender(s) {
 	}
 }
 
-class BalanceBond extends InputBond {
+export default class BalanceBond extends InputBond {
 	constructor() {
 		super()
 	}
@@ -119,5 +119,3 @@ BalanceBond.defaultProps = {
 		} : null
 	}
 }
-
-module.exports = { BalanceBond }
