@@ -143,60 +143,7 @@ export default class App extends ReactiveComponent {
 				<div style={{ paddingBottom: '1em' }}>
 					<WalletList />
 				</div>
-			</Segment>
-			<Divider hidden />
-			<Segment style={{ margin: '1em' }} padded>
-				<Header as='h2'>
-					<Icon name='search' />
-					<Header.Content>
-						Address Book
-						<Header.Subheader>Inspect the status of any account and name it for later use</Header.Subheader>
-					</Header.Content>
-				</Header>
-				<div style={{ paddingBottom: '1em' }}>
-					<div style={{ fontSize: 'small' }}>lookup account</div>
-					<AccountIdBond bond={this.lookup} />
-					<If condition={this.lookup.ready()} then={<div>
-						<Label>Encrypted Balance
-							<Label.Detail>
-								<Pretty value={runtime.confTransfer.encryptedBalance(this.lookup)} />
-							</Label.Detail>
-						</Label>
-						<Label>Decrypted Balance
-							<Label.Detail>
-								<Pretty value={this.lookupDecBal} />
-							</Label.Detail>
-						</Label>
-						<Label>Nonce
-							<Label.Detail>
-								<Pretty value={runtime.system.accountNonce(this.lookupRvk)} />
-							</Label.Detail>
-						</Label>
-						<Label>Address
-							<Label.Detail>
-								<Pretty value={this.lookup} />
-							</Label.Detail>
-						</Label>
-					</div>} />
-				</div>
-				<div style={{ paddingBottom: '1em' }}>
-					<div style={{ fontSize: 'small' }}>name</div>
-					<InputBond
-						bond={this.nick}
-						placeholder='A name for this address'
-						validator={n => n ? addressBook().map(ss => ss.byName[n] ? null : n) : null}
-						action={<TransformBondButton
-							content='Add'
-							transform={(name, account) => { addressBook().submit(account, name); return true }}
-							args={[this.nick, this.lookup]}
-							immediate
-						/>}
-					/>
-				</div>
-				<div style={{ paddingBottom: '1em' }}>
-					<AddressBookList />
-				</div>
-			</Segment>
+			</Segment>			
 			<Divider hidden />			
 			<Segment style={{ margin: '1em' }} padded>
 				<Header as='h2'>
@@ -268,7 +215,60 @@ export default class App extends ReactiveComponent {
 					// 		this.preparedVk
 					// 	)}
 				/>
-			</Segment>			
+			</Segment>		
+			<Divider hidden />
+			<Segment style={{ margin: '1em' }} padded>
+				<Header as='h2'>
+					<Icon name='search' />
+					<Header.Content>
+						Address Book
+						<Header.Subheader>Inspect the status of any account and name it for later use</Header.Subheader>
+					</Header.Content>
+				</Header>
+				<div style={{ paddingBottom: '1em' }}>
+					<div style={{ fontSize: 'small' }}>lookup account</div>
+					<AccountIdBond bond={this.lookup} />
+					<If condition={this.lookup.ready()} then={<div>
+						<Label>Encrypted Balance
+							<Label.Detail>
+								<Pretty value={runtime.confTransfer.encryptedBalance(this.lookup)} />
+							</Label.Detail>
+						</Label>
+						<Label>Decrypted Balance
+							<Label.Detail>
+								<Pretty value={this.lookupDecBal} />
+							</Label.Detail>
+						</Label>
+						<Label>Nonce
+							<Label.Detail>
+								<Pretty value={runtime.system.accountNonce(this.lookupRvk)} />
+							</Label.Detail>
+						</Label>
+						<Label>Address
+							<Label.Detail>
+								<Pretty value={this.lookup} />
+							</Label.Detail>
+						</Label>
+					</div>} />
+				</div>
+				<div style={{ paddingBottom: '1em' }}>
+					<div style={{ fontSize: 'small' }}>name</div>
+					<InputBond
+						bond={this.nick}
+						placeholder='A name for this address'
+						validator={n => n ? addressBook().map(ss => ss.byName[n] ? null : n) : null}
+						action={<TransformBondButton
+							content='Add'
+							transform={(name, account) => { addressBook().submit(account, name); return true }}
+							args={[this.nick, this.lookup]}
+							immediate
+						/>}
+					/>
+				</div>
+				<div style={{ paddingBottom: '1em' }}>
+					<AddressBookList />
+				</div>
+			</Segment>	
 		</div>);
 	}
 }
