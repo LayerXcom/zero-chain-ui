@@ -46,12 +46,7 @@ function composeTransaction (sender, call, index, era, checkpoint, senderAccount
 		let [signature, sender_rvk] = secretStore().sign(senderAccount, e)
 		signature = Uint8Array.from(signature)	
 		sender_rvk = new AccountId(sender_rvk)	
-		// console.log(sender) 
-		// sender = hexToBytes("0x791b91fae07feada7b6f6042b1e214bc75759b3921956053936c38a95271a834");
-		// sender = secretStore().rvkFromAccount(sender)
-		console.log("HERE!!!")
-		console.log(sender_rvk)
-		console.log(sender)
+		
 		console.log("encoding transaction", sender_rvk, index, era, call);
 		let signedData = encode(encode({
 			_type: 'Transaction',
@@ -75,11 +70,7 @@ function composeTransaction (sender, call, index, era, checkpoint, senderAccount
 // }
 function post(tx) {
 	return Bond.all([tx, chain.height, runtimeUp]).map(([o, height, unused]) => {
-		let {sender, call, index, longevity, compact} = o		
-
-		console.log("here!!")
-		console.log(sender)
-		console.log(call)
+		let {sender, call, index, longevity, compact} = o				
 
 		// let sk = secretStore().seedFromAccount(sender)
 		// let randomSeed = new Uint32Array(8)

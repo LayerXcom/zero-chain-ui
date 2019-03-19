@@ -64,14 +64,12 @@ class SecretStore extends Bond {
 		return this._keys.map(k => k.account)
 	}
 
-	find (identifier) {
-		// console.log(`tmp1: ${identifier}`)
+	find (identifier) {		
 		if (this._keys.indexOf(identifier) !== -1) {					
 			return identifier
 		}
 		if (identifier instanceof Uint8Array && identifier.length == 32 || identifier instanceof AccountId) {
-			identifier = new AccountId(identifier)
-			// console.log(`tmp2: ${identifier}`)
+			identifier = new AccountId(identifier)			
 			identifier = ss58Encode(identifier)
 		}
 		return this._byAddress[identifier] ? this._byAddress[identifier] : this._byName[identifier]
@@ -80,23 +78,19 @@ class SecretStore extends Bond {
 	getIvk(who) {		
 		let item = this.find(who)
 		if (item) {			
-			let ivk = gen_ivk(item.seed)
-			console.log(Uint8Array.from(ivk))
+			let ivk = gen_ivk(item.seed)			
 			return Uint8Array.from(ivk)
-		}
-		console.log("c!")
+		}		
 		return null
 	}
 
 	sign (from, data) {
-		let item = this.find(from)
-		console.log(`item: ${item}`)
+		let item = this.find(from)		
 		if (item) {
-			console.info(`Signing data from ${item.name}`, bytesToHex(data))
-			// let sig = nacl.sign.detached(data, item.key.secretKey)
+			console.info(`Signing data from ${item.name}`, bytesToHex(data))			
 			let seed = new Uint32Array(8);
 			self.crypto.getRandomValues(seed);
-			// let sig = sign(item.seed, data, seed)  // Change item.seed to ask
+			
 			let rsk = gen_rsk(item.seed)
 			let rvk = gen_rvk(item.seed)
 			// let rsk = hexToBytes("0xdcfd7a3cb8291764a4e1ab41f6831d2e285a98114cdc4a2d361a380de0e3cb07")

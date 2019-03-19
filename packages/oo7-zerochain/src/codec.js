@@ -521,10 +521,8 @@ function encode(value, type = null) {
 		return toLE(value * 1000000, 4)
 	}
 
-	if (value instanceof Uint8Array) {
-		console.log(`value:${value}`)
-		if (type == 'Signature' && value.length == 64) {
-			console.log(`value:${value}`)
+	if (value instanceof Uint8Array) {		
+		if (type == 'Signature' && value.length == 64) {			
 			return value
 		}
 		if (type == 'Hash' && value.length == 32) {

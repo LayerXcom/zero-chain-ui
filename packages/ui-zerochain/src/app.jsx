@@ -35,6 +35,11 @@ export default class App extends ReactiveComponent {
 		this.destination = new Bond;
 		this.nick = new Bond;
 		this.lookup = new Bond;
+		this.lookupRvk = this.lookup.map(v => v ? secretStore().rvkFromAccount(v) : undefined)
+		this.lookupRvk.use()		
+		this.lookupDecBal = this.lookup.map(v => v ? runtime.confTransfer.encryptedBalance(v).map(e => e ? decrypt_ca(e, secretStore().getIvk(v)) : undefined) : undefined)
+		this.lookupDecBal.use()
+
 		this.name = new Bond;
 		this.seed = new Bond;
 		this.seedAccount = this.seed.map(s => s ? secretStore().accountFromPhrase(s) : undefined)
@@ -43,13 +48,12 @@ export default class App extends ReactiveComponent {
 
 		this.address = new Bond;
 		this.proof = new Bond;
-		this.addressSender = new Bond;
-		this.addressRecipient = new Bond;
+				
 		this.valueSender = new Bond;
 		this.valueRecipient = new Bond;
 		this.balanceSender = new Bond;
 		this.rk = new Bond;
-		this.zAddr = new Bond;
+	
 		this.provingKey = new Bond;
 		this.preparedVk = new Bond;
 		this.encAddress = new Bond;
@@ -153,14 +157,19 @@ export default class App extends ReactiveComponent {
 					<div style={{ fontSize: 'small' }}>lookup account</div>
 					<AccountIdBond bond={this.lookup} />
 					<If condition={this.lookup.ready()} then={<div>
-						<Label>Balance
+						<Label>Encrypted Balance
 							<Label.Detail>
-								<Pretty value={runtime.balances.balance(this.lookup)} />
+								<Pretty value={runtime.confTransfer.encryptedBalance(this.lookup)} />
+							</Label.Detail>
+						</Label>
+						<Label>Decrypted Balance
+							<Label.Detail>
+								<Pretty value={this.lookupDecBal} />
 							</Label.Detail>
 						</Label>
 						<Label>Nonce
 							<Label.Detail>
-								<Pretty value={runtime.system.accountNonce(this.lookup)} />
+								<Pretty value={runtime.system.accountNonce(this.lookupRvk)} />
 							</Label.Detail>
 						</Label>
 						<Label>Address
@@ -188,82 +197,13 @@ export default class App extends ReactiveComponent {
 					<AddressBookList />
 				</div>
 			</Segment>
-			<Divider hidden />
-			{/* <Segment style={{ margin: '1em' }} padded>
-				<Header as='h2'>
-					<Icon name='send' />
-					<Header.Content>
-						Send Funds
-						<Header.Subheader>Send funds from your account to another</Header.Subheader>
-					</Header.Content>
-				</Header>
-				<div style={{ paddingBottom: '1em' }}>
-					<div style={{ fontSize: 'small' }}>from</div>
-					<SignerBond bond={this.source} />
-					<If condition={this.source.ready()} then={<span>
-						<Label>Balance
-							<Label.Detail>
-								<Pretty value={runtime.balances.balance(this.source)} />
-							</Label.Detail>
-						</Label>
-						<Label>Nonce
-							<Label.Detail>
-								<Pretty value={runtime.system.accountNonce(this.source)} />
-							</Label.Detail>
-						</Label>
-					</span>} />
-				</div>
-				<div style={{ paddingBottom: '1em' }}>
-					<div style={{ fontSize: 'small' }}>to</div>
-					<AccountIdBond bond={this.destination} />
-					<If condition={this.destination.ready()} then={
-						<Label>Balance
-							<Label.Detail>
-								<Pretty value={runtime.balances.balance(this.destination)} />
-							</Label.Detail>
-						</Label>
-					} />
-				</div>
-				<div style={{ paddingBottom: '1em' }}>
-					<div style={{ fontSize: 'small' }}>amount</div>
-					<BalanceBond bond={this.amount} />
-				</div>
-				<TransactButton
-					content="Send"
-					icon='send'
-					tx={{
-						sender: runtime.indices.tryIndex(this.source),
-						call: calls.balances.transfer(this.destination, this.amount)
-					}}
-				/>
-			</Segment> */}
-			<Divider hidden />
-			{/* <Segment style={{ margin: '1em' }} padded>
-				<Header as='h2'>
-					<Icon name='search' />
-					<Header.Content>
-						Runtime Upgrade
-						<Header.Subheader>Upgrade the runtime using the Sudo module</Header.Subheader>
-					</Header.Content>
-				</Header>
-				<div style={{ paddingBottom: '1em' }}></div>
-				<FileUploadBond bond={this.runtime} content='Select Runtime' />
-				<TransactButton
-					content="Upgrade"
-					icon='warning'
-					tx={{
-						sender: runtime.sudo.key,
-						call: calls.sudo.sudo(calls.consensus.setCode(this.runtime))
-					}}
-				/>
-			</Segment>
-			<Divider hidden /> */}
+			<Divider hidden />			
 			<Segment style={{ margin: '1em' }} padded>
 				<Header as='h2'>
 					<Icon name='send' />
 					<Header.Content>
 						Confidential transfer
-						<Header.Subheader>Confidential transfer</Header.Subheader>
+						<Header.Subheader>Send the coins. The value is encrypted. </Header.Subheader>
 					</Header.Content>
 				</Header>
 				{/* <FileUploadBond bond={this.provingKey} content='Add Proving Key' />		
@@ -295,11 +235,11 @@ export default class App extends ReactiveComponent {
 					<BalanceBond bond={this.amount} />							
 				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Proof (192 bytes)</div>
 					<InputBond bond={this.proof} validator={n => n || null} placeholder='0x...' />		
-				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted amount (sender)</div>
+				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted amount by sender (64 bytes)</div>
 				<InputBond bond={this.valueSender} validator={n => n || null} placeholder='0x...' />
-				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted amount (recipient)</div>
+				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted amount by recipient (64 bytes)</div>
 				<InputBond bond={this.valueRecipient} validator={n => n || null} placeholder='0x...' />
-				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted balance (sender)</div>
+				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted balance by sender (64 bytes)</div>
 				<InputBond bond={this.balanceSender} validator={n => n || null} placeholder='0x...' />
 				<Divider hidden />
 				<TransactButton
@@ -328,65 +268,7 @@ export default class App extends ReactiveComponent {
 					// 		this.preparedVk
 					// 	)}
 				/>
-			</Segment>
-			<Divider hidden />
-			<Segment style={{ margin: '1em' }} padded>
-				<Header as='h2'>
-					<Icon name='send' />
-					<Header.Content>
-						Confidential transfer
-						<Header.Subheader>Confidential transfer</Header.Subheader>
-					</Header.Content>
-				</Header>	
-				<FileUploadBond bond={this.provingKey} content='Add Proving Key' />				
-				<div style={{ paddingBottom: '1em' }}>
-					<div style={{ fontSize: 'small' }}>from</div>
-					<SignerBond bond={this.zAddr} />
-					<If condition={this.zAddr.ready()} then={<span>
-						<Label>Balance
-							<Label.Detail>
-								<Pretty value={runtime.balances.balance(this.zAddr)} />
-							</Label.Detail>
-						</Label>
-						<Label>Nonce
-							<Label.Detail>
-								<Pretty value={runtime.system.accountNonce(this.zAddr)} />
-							</Label.Detail>
-						</Label>
-					</span>} />
-				</div>			
-				<div style={{ fontSize: 'small' }}>Proof (192 bytes)</div>
-				<InputBond bond={this.proof} validator={n => n || null} placeholder='0x...' />
-				<div style={{ fontSize: 'small' }}>From</div>
-				<InputBond bond={this.addressSender} />
-				<div style={{ fontSize: 'small' }}>To</div>
-				<InputBond bond={this.addressRecipient} />
-				{/* <AccountIdBond bond={this.addressRecipient} /> */}
-				<div style={{ fontSize: 'small' }}>Encrypted amount (sender)</div>
-				<InputBond bond={this.valueSender} />
-				<div style={{ fontSize: 'small' }}>Encrypted amount (recipient)</div>
-				<InputBond bond={this.valueRecipient} />
-				<div style={{ fontSize: 'small' }}>Encrypted balance (sender)</div>
-				<InputBond bond={this.balanceSender} />
-				<div style={{ fontSize: 'small' }}>Signature verification key</div>
-				<InputBond bond={this.rk} />
-				<TransactButton
-					content="Confidential transfer"
-					icon='send'
-					tx={{
-						sender: this.zAddr, // sig verification key
-						call: calls.confTransfer.confidentialTransfer(
-							this.proof,
-							this.addressSender,
-							this.addressRecipient,
-							this.valueSender,
-							this.valueRecipient,
-							this.balanceSender,
-							this.rk
-						)
-					}}
-				/>
-			</Segment>
+			</Segment>			
 		</div>);
 	}
 }
