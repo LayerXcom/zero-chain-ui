@@ -15,11 +15,11 @@ https://github.com/LayerXcom/zero-chain
 ```
 brew install yarn
 ```
-- Then install dependencies
+- Then install dependencies:
 ```
 yarn install
 ```
-- Run the app
+- Run the app:
 ```
 yarn run dev
 ```
@@ -29,6 +29,6 @@ open -a "Firefox" http://localhost:8000
 ```
 
 ## Usage
-You can send a confidential transaction to the zerochain and update the encrypted balance. For now, the proccess of generating transaction needs to be executed by CLI (including the zero knowledge proving and encryption). Fill out the UI form based on the CLI printout.
+You can send a confidential transaction to the zerochain and update the encrypted balance. For now, the proccess of generating the transaction needs to be executed by CLI (including the zero knowledge proving and encryption). Fill out the UI form based on the CLI printout.
 
-
+The details how to send transactions are described in the [zerochain README](https://github.com/LayerXcom/zero-chain).

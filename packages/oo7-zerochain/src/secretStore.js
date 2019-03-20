@@ -120,11 +120,17 @@ class SecretStore extends Bond {
 			this._keys = JSON.parse(this._storage.secretStore).map(({ seed, phrase, name }) => ({ phrase, name, seed: hexToBytes(seed) }))
 		} else if (this._storage.secretStore2) {
 			this._keys = JSON.parse(this._storage.secretStore2).map(({ seed, name }) => ({ phrase: seed, name }))
-		} else {
-			this._keys = [{
-				name: 'Default',
-				phrase: generateMnemonic()
-			}]
+		} else {			
+			this._keys = [
+				{
+					name: 'Alice',
+					phrase: "0x416c696365202020202020202020202020202020202020202020202020202020"
+				},
+				{
+					name: 'Bob',
+					phrase: "0x426f622020202020202020202020202020202020202020202020202020202020"
+				}
+			]
 		}
 		this._sync()
 	}
