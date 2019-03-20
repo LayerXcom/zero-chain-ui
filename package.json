@@ -6,7 +6,8 @@
         "lint": "lerna run lint",
         "test": "lerna run test",
         "lerna": "lerna",
-        "esdoc": "esdoc"
+        "esdoc": "esdoc",        
+        "dev": "cd packages/ui-zerochain && yarn run dev"
     },
     "devDependencies": {
         "esdoc": "^1.0.4",
