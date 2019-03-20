@@ -185,9 +185,7 @@ export default class App extends ReactiveComponent {
 				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted amount by sender (64 bytes)</div>
 				<InputBond bond={this.valueSender} validator={n => n || null} placeholder='0x...' />
 				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted amount by recipient (64 bytes)</div>
-				<InputBond bond={this.valueRecipient} validator={n => n || null} placeholder='0x...' />
-				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted balance by sender (64 bytes)</div>
-				<InputBond bond={this.balanceSender} validator={n => n || null} placeholder='0x...' />
+				<InputBond bond={this.valueRecipient} validator={n => n || null} placeholder='0x...' />				
 				<Divider hidden />
 				<TransactButton
 					content="Confidential transfer"
@@ -200,8 +198,7 @@ export default class App extends ReactiveComponent {
 							this.encAddress,
 							this.destination,
 							this.valueSender,
-							this.valueRecipient,
-							this.balanceSender,
+							this.valueRecipient,							
 							this.rvk
 						),
 						index: runtime.system.accountNonce(this.rvk)
