@@ -9,7 +9,6 @@ https://github.com/LayerXcom/zero-chain
 <img src="https://user-images.githubusercontent.com/20852667/54670894-04113880-4b38-11e9-9c75-13ad5b1b0ff5.png" width="1000px">
 </div>
 
-
 ## Setup
 - To install using brew:
 ```
