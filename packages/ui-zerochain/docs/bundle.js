@@ -177,7 +177,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"../oo7-zerochain/node_modules/zerochain-wasm-utils/zerochain_wasm_utils_bg.wasm":"533cfe67496a7947ec2e","./node_modules/zerochain-wasm-utils/zerochain_wasm_utils_bg.wasm":"62f0d0b9b9dcd39c8b70"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"../oo7-zerochain/node_modules/zerochain-wasm-utils/zerochain_wasm_utils_bg.wasm":"9263937dfe861c84f3fe","./node_modules/zerochain-wasm-utils/zerochain_wasm_utils_bg.wasm":"25def24a4bc6ee12d156"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {

@@ -4,7 +4,7 @@ const { generateMnemonic, mnemonicToSeed } = require('bip39')
 const { ss58Encode } = require('./ss58')
 const { AccountId } = require('./types')
 const { bytesToHex, hexToBytes } = require('./utils')
-const { gen_account_id, sign, gen_ivk, verify, gen_rsk, gen_rvk } = require('zerochain-wasm-utils')
+const { gen_account_id, sign, gen_bdk, verify, gen_rsk, gen_rvk } = require('zerochain-wasm-utils')
 
 let cache = {}
 
@@ -78,7 +78,7 @@ class SecretStore extends Bond {
 	getIvk(who) {		
 		let item = this.find(who)
 		if (item) {			
-			let ivk = gen_ivk(item.seed)			
+			let ivk = gen_bdk(item.seed)			
 			return Uint8Array.from(ivk)
 		}		
 		return null
@@ -93,11 +93,10 @@ class SecretStore extends Bond {
 			
 			let rsk = gen_rsk(item.seed)
 			let rvk = gen_rvk(item.seed)
-			// let rsk = hexToBytes("0xdcfd7a3cb8291764a4e1ab41f6831d2e285a98114cdc4a2d361a380de0e3cb07")
-			// let rvk = hexToBytes("0x791b91fae07feada7b6f6042b1e214bc75759b3921956053936c38a95271a834")
-			let sig = sign(rsk, data, seed)  // Change item.seed to ask
+
+			let sig = sign(rsk, data, seed)  
 			console.info(`Signature is ${bytesToHex(sig)}`)
-			if (!verify(rvk, data, sig)) {   // Change item.key to rk
+			if (!verify(rvk, data, sig)) {   
 				console.warn(`Signature is INVALID!`)
 				return null
 			}
