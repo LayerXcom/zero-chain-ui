@@ -271,10 +271,8 @@ class SecretStore extends Bond {
 					self.crypto.getRandomValues(seed);
 
 					let rsk = gen_rsk(item.keyData)
-					// let rvk = gen_rvk(item.keyData)
 
-					let sig = sign_wasm(rsk, data, seed)
-					console.info(`Signature is ${bytesToHex(sig)}`)
+					sig = sign_wasm(rsk, data, seed)
 					if (!verify_wasm(rvk, data, sig)) {
 						console.warn(`Signature is INVALID!`)
 						return null

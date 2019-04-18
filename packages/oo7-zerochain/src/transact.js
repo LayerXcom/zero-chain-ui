@@ -44,6 +44,8 @@ function composeTransaction (sender, call, index, era, checkpoint, senderAccount
 		}
 
 		let [signature, sender_rvk] = secretStore().sign(senderAccount, e)
+		console.log(signature)
+
 		signature = Uint8Array.from(signature)
 		sender_rvk = new AccountId(sender_rvk)
 
