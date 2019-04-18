@@ -301,7 +301,8 @@ class SecretStore extends Bond {
 			this._keys = JSON.parse(this._storage.secretStore)
 				.map(({ keyData, seed, uri, phrase, name, type }) => ({
 					name,
-					keyData: null,//hexToBytes(keyData || seed),
+					// keyData: null,//hexToBytes(keyData || seed),
+					keyData: keyData,
 					uri: uri || phrase,
 					type: type || ED25519
 				}))
@@ -331,14 +332,16 @@ class SecretStore extends Bond {
 		let item
 		switch (type) {
 			case ED25519: {
-				keyData = keyData || edSeedFromUri(uri)
+				// keyData = keyData || edSeedFromUri(uri)
+				// keyData = keyData
 				key = key || nacl.sign.keyPair.fromSeed(keyData)
 				let account = new AccountId(key.publicKey)
 				item = { uri, name, type, key, keyData, account }
 				break
 			}
 			case SR25519: {
-				keyData = keyData || edSeedFromUri(uri)
+				// keyData = keyData || edSeedFromUri(uri)
+				keyData = hexToBytes(keyData)
 				key = key || gen_account_id(keyData)
 				let account = new AccountId(key)
 				item = { uri, name, type, key, keyData, account }
