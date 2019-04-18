@@ -10,14 +10,14 @@ const { setMetadata } = require('./metadata')
 
 let chain = (() => {
 	let head = new SubscriptionBond('chain_newHead').subscriptable()
-	let finalisedHead = new SubscriptionBond('chain_finalisedHead').subscriptable()
+	let finalizedHead = new SubscriptionBond('chain_finalizedHead').subscriptable()
 	let height = head.map(h => new BlockNumber(h.number))
-	let finalisedHeight = finalisedHead.map(h => new BlockNumber(h.number))
-	let lag = Bond.all([height, finalisedHeight]).map(([h, f]) => new BlockNumber(h - f))
+	let finalizedHeight = finalizedHead.map(h => new BlockNumber(h.number))
+	let lag = Bond.all([height, finalizedHeight]).map(([h, f]) => new BlockNumber(h - f))
 	let header = hashBond => new TransformBond(hash => nodeService().request('chain_getHeader', [hash]), [hashBond]).subscriptable()
 	let block = hashBond => new TransformBond(hash => nodeService().request('chain_getBlock', [hash]), [hashBond]).subscriptable()
-	let hash = numberBond => new TransformBond(number => nodeService().request('chain_getBlockHash', [number]), [numberBond])
-	return { head, finalisedHead, height, finalisedHeight, header, hash, block, lag }
+	let hash = numberBond => new TransformBond(number => nodeService().request('chain_getBlockHash', [number]).then(hexToBytes), [numberBond])
+	return { head, finalizedHead, height, finalizedHeight, header, hash, block, lag }
 })()
 
 let system = (() => {
@@ -51,7 +51,7 @@ let version = (new SubscriptionBond('state_runtimeVersion', [], r => {
 })).subscriptable()
 
 let runtime = {
-	version, 
+	version,
 	metadata: new Bond,
 	core: (() => {
 		let authorityCount = new SubscriptionBond('state_storage', [['0x' + bytesToHex(stringToBytes(':auth:len'))]], r => decode(hexToBytes(r.changes[0][1]), 'u32'))
@@ -82,7 +82,7 @@ let runtimeUp = new RuntimeUp
 
 let onRuntimeInit = []
 
-function initialiseFromMetadata (md) {
+function initialiseFromMetadata(md) {
 	console.log("initialiseFromMetadata", md)
 	setMetadata(md)
 	let callIndex = 0;
@@ -94,16 +94,36 @@ function initialiseFromMetadata (md) {
 			m.storage.forEach(item => {
 				switch (item.type.option) {
 					case 'Plain': {
-						o[camel(item.name)] = new StorageBond(`${storePrefix} ${item.name}`, item.type.value, [], item.default)
+						o[camel(item.name)] = new StorageBond(`${storePrefix} ${item.name}`, item.type.value, [], item.modifier.option == 'Default' ? item.default : null)
 						break
 					}
 					case 'Map': {
 						let keyType = item.type.value.key
 						let valueType = item.type.value.value
-						o[camel(item.name)] = keyBond => new TransformBond(
-							key => new StorageBond(`${storePrefix} ${item.name}`, valueType, encode(key, keyType), item.default),
+						let hasDefault = item.modifier.option == 'Default'
+
+						o[camel(item.name)] = (keyBond, useDefault = hasDefault) => new TransformBond(
+							key => new StorageBond(`${storePrefix} ${item.name}`, valueType, encode(key, keyType), useDefault ? item.default : null),
 							[keyBond]
 						).subscriptable()
+						if (item.type.value.iterable) {
+							o[camel(item.name)].head = new StorageBond(`head of ${storePrefix} ${item.name}`, keyType)
+							let prefix = `${storePrefix} ${item.name}`;
+							let rest
+							rest = (pre, head) => {
+								if (head == null) {
+									return pre
+								} else {
+									return new TransformBond(
+										l => l && l[0]
+											? rest([...pre, { key: head, value: l[0][0] }], l[0][2])
+											: pre,
+										[new StorageBond(prefix, [valueType, `Option<${keyType}>`, `Option<${keyType}>`], encode(head, keyType))]
+									)
+								}
+							}
+							o[camel(item.name)].all = o[camel(item.name)].head.map(x => rest([], x))
+						}
 						break
 					}
 				}
@@ -123,12 +143,12 @@ function initialiseFromMetadata (md) {
 					return new TransformBond(args => {
 						let encoded_args = encode(args, item.arguments.map(x => x.type))
 						let res = new Uint8Array([thisCallIndex, id, ...encoded_args]);
-						console.log(`Encoding call ${m.name}.${item.name} (${thisCallIndex}.${id}): ${bytesToHex(res)}`)
+						//						console.log(`Encoding call ${m.name}.${item.name} (${thisCallIndex}.${id}): ${bytesToHex(res)}`)
 						return res
 					}, [bondArgs], [], 3, 3, undefined, true)
 				}
 				c[camel(item.name)].help = item.arguments.map(a => a.name)
-			})				
+			})
 		}
 		runtime[camel(m.name)] = o
 		calls[camel(m.name)] = c
@@ -158,6 +178,10 @@ function decodeMetadata(bytes) {
 	let head = decode(input, 'MetadataHead')
 	if (head.magic === 0x6174656d) {
 		if (head.version == 1) {
+			return decode(input, 'MetadataBodyV1')
+		} else if (head.version == 2) {
+			return decode(input, 'MetadataBodyV2')
+		} else if (head.version == 3) {
 			return decode(input, 'MetadataBody')
 		} else {
 			throw `Metadata version ${head.version} not supported`
@@ -175,11 +199,11 @@ function decodeMetadata(bytes) {
 	}
 }
 
-function initRuntime (callback = null) {
+function initRuntime(callback = null) {
 	if (onRuntimeInit instanceof Array) {
 		onRuntimeInit.push(callback)
 		version.tie(() => {
-//			console.info("Initialising runtime")
+			//			console.info("Initialising runtime")
 			nodeService().request('state_getMetadata')
 				.then(blob => decodeMetadata(hexToBytes(blob)))
 				.then(initialiseFromMetadata)

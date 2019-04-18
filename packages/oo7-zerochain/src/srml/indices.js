@@ -25,9 +25,9 @@ function augment(runtime, chain) {
 	}
 
 	indices.lookup = indexBond => new TransformBond(index =>
-		isIndex(index) || typeof(index) === 'number'
-		? indices.enumSet(new AccountIndex(Math.floor(index / 64))).map(items => items[index % 64])
-		: null,
+		isIndex(index) || typeof (index) === 'number'
+			? indices.enumSet(new AccountIndex(Math.floor(index / 64))).map(items => items[index % 64])
+			: null,
 		[indexBond]
 	)
 
@@ -35,7 +35,7 @@ function augment(runtime, chain) {
 		[...new Array(last + 1)].map((_, i) => indices.enumSet(i))
 	).map(sets => {
 		let res = {}
-		sets.forEach((items, i) => 
+		sets.forEach((items, i) =>
 			items.forEach((item, j) =>
 				res[ss58Encode(item)] = i * 64 + j
 			)
@@ -43,19 +43,28 @@ function augment(runtime, chain) {
 		return res
 	}).subscriptable()
 
-	indices.tryIndex = (id, whenNone = id) => new TransformBond((accounts, id, whenNone) => {
-		if (typeof id === 'string') {
-			id = ss58Decode(id)
+	indices.tryIndex = (id, whenNone = id) => {
+		if (!id) {
+			console.warn("bad identity passed to tryIndex", id)
 		}
-		if (isId(id)) {
-			let i = accounts[ss58Encode(id)]
-			return isIndex(i)
-				? new AccountIndex(i)
-				: whenNone
-		} else {
-			return whenNone
-		}
-	}, [indices.accounts, id, whenNone], [], 3, 3, undefined, false)
+		return new TransformBond((accounts, id, whenNone) => {
+			if (!id) {
+				console.warn("bad identity resolved to tryIndex", id)
+				return undefined
+			}
+			if (typeof id === 'string') {
+				id = ss58Decode(id)
+			}
+			if (isId(id)) {
+				let i = accounts[ss58Encode(id)]
+				return isIndex(i)
+					? new AccountIndex(i)
+					: whenNone
+			} else {
+				return whenNone
+			}
+		}, [indices.accounts, id, whenNone], [], 3, 3, undefined, false)
+	}
 
 	indices.ss58Encode = (address, type, csLength, length) => new TransformBond((address, id, index, type, csLength, length) => {
 		if (isIndex(address)) {
@@ -72,7 +81,7 @@ function augment(runtime, chain) {
 
 	indices.ss58Decode = address => {
 		try {
-			let indexOrId = ss58Decode(address, index => { throw {index} })
+			let indexOrId = ss58Decode(address, index => { throw { index } })
 			if (isId(indexOrId)) {
 				return fixedBond(indexOrId)
 			} else {

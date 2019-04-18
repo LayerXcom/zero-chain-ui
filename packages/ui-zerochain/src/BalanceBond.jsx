@@ -1,7 +1,7 @@
 import React from 'react';
 import {Dropdown} from 'semantic-ui-react';
 import InputBond from './InputBond';
-import {denominations, denominationInfo} from 'oo7-zerochain';
+import {denominations, denominationInfo, Balance} from 'oo7-zerochain';
 
 function formatValueNoDenom(n) {
 	return `${n.units.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1,')}${n.decimals ? '.' + n.decimals : ''}`
@@ -114,7 +114,7 @@ BalanceBond.defaultProps = {
 			internal: q,
 			display: d,
 			corrected: formatValueNoDenom(q),
-			external: combineValue(q),
+			external: new Balance(combineValue(q)),
 			ok: true
 		} : null
 	}

@@ -1,10 +1,12 @@
 const bs58 = require('bs58')
 const { blake2b } = require('blakejs')
-const { toLE, leToNumber } = require('./utils')
+const { toLE, leToNumber, stringToBytes } = require('./utils')
 const { AccountIndex, AccountId } = require('./types')
 
 let defaultType = 42
 const KNOWN_TYPES = [0, 1, 42, 43, 68, 69]
+
+const PREFIX = stringToBytes('SS58PRE')
 
 function setNetworkDefault(type) {
 	defaultType = type
@@ -39,7 +41,7 @@ function ss58Encode(a, type = defaultType, checksumLength = null, length = null,
 	} else {
 		throw new Error('Unknown item to encode as ss58. Passing back.', a)
 	}
-	let hash = blake2b((type & 1) ? accountId : new Uint8Array([type, ...payload]))
+	let hash = blake2b(new Uint8Array([...PREFIX, ...((type & 1) ? accountId : new Uint8Array([type, ...payload]))]))
 	let complete = new Uint8Array([type, ...payload, ...hash.slice(0, checksumLength)])
 	return bs58.encode(Buffer.from(complete))
 }
@@ -67,12 +69,12 @@ function ss58Decode(ss58, lookupIndex) {
 	let length = a.length <= 3
 		? 1
 		: a.length <= 5
-		? 2
-		: a.length <= 9
-		? 4
-		: a.length <= 17
-		? 8
-		: 32
+			? 2
+			: a.length <= 9
+				? 4
+				: a.length <= 17
+					? 8
+					: 32
 	let checksumLength = a.length - 1 - length
 
 	let payload = a.slice(1, 1 + length)
@@ -90,7 +92,7 @@ function ss58Decode(ss58, lookupIndex) {
 	if (a[0] % 1 && !accountId && !lookupIndex) {
 		return null
 	}
-	let hash = blake2b(a[0] % 1 ? (accountId || lookupIndex(result)) : a.slice(0, 1 + length))
+	let hash = blake2b(new Uint8Array([...PREFIX, ... (a[0] % 1 ? (accountId || lookupIndex(result)) : a.slice(0, 1 + length))]))
 
 	for (var i = 0; i < checksumLength; ++i) {
 		if (hash[i] !== a[1 + length + i]) {

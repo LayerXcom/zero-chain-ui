@@ -10,6 +10,12 @@ class AccountId extends Uint8Array {
 	toJSON() {
 		return { _type: 'AccountId', data: Array.from(this) }
 	}
+	compare(other) {
+		return this.length === other.length && this.every((v, i) => other[i] === v)
+	}
+	memberOf(set) {
+		return set.find(item => this.compare(item)) !== undefined
+	}
 }
 
 class Hash extends Uint8Array {
@@ -26,19 +32,25 @@ class Signature extends Uint8Array {
 
 class VoteThreshold extends String {
 	toJSON() {
-		return { _type: 'VoteThreshold', data: this + ''}
+		return { _type: 'VoteThreshold', data: this + '' }
+	}
+}
+
+class RewardDestination extends String {
+	toJSON() {
+		return { _type: 'RewardDestination', data: this + '' }
 	}
 }
 
 class BlockNumber extends Number {
 	toJSON() {
-		return { _type: 'BlockNumber', data: this+0 }
+		return { _type: 'BlockNumber', data: this + 0 }
 	}
 }
 
 class AccountIndex extends Number {
 	toJSON() {
-		return { _type: 'AccountIndex', data: this+0 }
+		return { _type: 'AccountIndex', data: this + 0 }
 	}
 }
 
@@ -49,15 +61,15 @@ class Tuple extends Array {
 }
 
 class SlashPreference extends Number {
-	toJSON() { return { _type: 'SlashPreference', data: this+0 } }
+	toJSON() { return { _type: 'SlashPreference', data: this + 0 } }
 }
 
 class Perbill extends Number {
-	toJSON() { return { _type: 'Perbill', data: this+0 } }
+	toJSON() { return { _type: 'Perbill', data: this + 0 } }
 }
 
 class Permill extends Number {
-	toJSON() { return { _type: 'Permill', data: this+0 } }
+	toJSON() { return { _type: 'Permill', data: this + 0 } }
 }
 
 class Moment extends Date {
@@ -71,13 +83,13 @@ class Moment extends Date {
 }
 
 class Balance extends Number {
-	toJSON() { return { _type: 'Balance', data: this+0 } }
+	toJSON() { return { _type: 'Balance', data: this + 0 } }
 	add(b) { return new Balance(this + b) }
 	sub(b) { return new Balance(this - b) }
 }
 
 class TransactionEra {
-	constructor (period, phase) {
+	constructor(period, phase) {
 		if (typeof period === 'number' && typeof phase === 'number') {
 			this.period = 2 << Math.min(15, Math.max(1, Math.ceil(Math.log2(period)) - 1))
 			this.phase = phase % this.period
@@ -112,10 +124,13 @@ function reviver(key, bland) {
 			case 'Balance': return new Balance(bland.data);
 			case 'BlockNumber': return new BlockNumber(bland.data);
 			case 'AccountIndex': return new AccountIndex(bland.data);
+			case 'Payee': return new Payee(bland.data);
 		}
 	}
 	return bland;
 }
 
-module.exports = { VecU8, AccountId, Hash, Signature, VoteThreshold, SlashPreference, Moment, Balance,
-	BlockNumber, AccountIndex, Tuple, TransactionEra, Perbill, Permill, reviver }
+module.exports = {
+	VecU8, AccountId, Hash, Signature, VoteThreshold, SlashPreference, Moment, Balance,
+	BlockNumber, AccountIndex, Tuple, TransactionEra, Perbill, Permill, reviver, RewardDestination
+}

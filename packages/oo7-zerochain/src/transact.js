@@ -18,11 +18,11 @@ const fromHexString = hexString =>
 	new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
 
 function composeTransaction (sender, call, index, era, checkpoint, senderAccount, compact) {
-	return new Promise((resolve, reject) => {				
+	return new Promise((resolve, reject) => {
 		if (typeof sender == 'string') {
 			sender = ss58Decode(sender)
-		}				
-		if (sender instanceof Uint8Array && sender.length == 32) {			
+		}
+		if (sender instanceof Uint8Array && sender.length == 32) {
 			senderAccount = sender
 		} else if (!senderAccount) {
 			reject(`Invalid senderAccount when sender is account index`)
@@ -42,11 +42,11 @@ function composeTransaction (sender, call, index, era, checkpoint, senderAccount
 			console.log(`Oversize transaction (length ${e.length} bytes). Hashing.`)
 			e = blake2b(e, null, 32)
 		}
-			
+
 		let [signature, sender_rvk] = secretStore().sign(senderAccount, e)
-		signature = Uint8Array.from(signature)	
-		sender_rvk = new AccountId(sender_rvk)	
-		
+		signature = Uint8Array.from(signature)
+		sender_rvk = new AccountId(sender_rvk)
+
 		console.log("encoding transaction", sender_rvk, index, era, call);
 		let signedData = encode(encode({
 			_type: 'Transaction',
@@ -70,19 +70,24 @@ function composeTransaction (sender, call, index, era, checkpoint, senderAccount
 // }
 function post(tx) {
 	return Bond.all([tx, chain.height, runtimeUp]).map(([o, height, unused]) => {
-		let {sender, call, index, longevity, compact} = o				
+		if (o instanceof Uint8Array) {
+			// already assembled and signed
+			return o
+		}
+
+		let {sender, call, index, longevity, compact} = o
 
 		// let sk = secretStore().seedFromAccount(sender)
 		// let randomSeed = new Uint32Array(8)
 		// self.crypto.getRandomValues(randomSeed)
-		// let addressRecipient = 
+		// let addressRecipient =
 
 		// let args = gen_call()
 
 		// defaults
 		longevity = typeof longevity === 'undefined' ? 256 : longevity
 		compact = typeof compact === 'undefined' ? true : compact
-		
+
 		let senderIsIndex = typeof sender === 'number' || sender instanceof AccountIndex
 
 		let senderAccount = senderIsIndex
@@ -91,7 +96,7 @@ function post(tx) {
 		if (senderIsIndex && !compact) {
 			sender = senderAccount
 		}
-	
+
 		let era
 		let eraHash
 		if (longevity === true) {
@@ -107,7 +112,7 @@ function post(tx) {
 			let phase = eraNumber % period
 			era = new TransactionEra(period, phase)
 			eraHash = chain.hash(eraNumber)
-		}		
+		}
 		return {
 			sender,
 			call,
@@ -117,8 +122,8 @@ function post(tx) {
 			senderAccount,
 			compact
 		}
-	}, 2).latched(false).map(o => 
-		o && composeTransaction(o.sender, o.call, o.index, o.era, o.eraHash, o.senderAccount, o.compact)
+	}, 2).latched(false).map(o =>
+		o && (o instanceof Uint8Array ? o : composeTransaction(o.sender, o.call, o.index, o.era, o.eraHash, o.senderAccount, o.compact))
 	).map(composed => {
 		return composed ? new TransactionBond(composed) : { signing: true }
 	})
