@@ -5403,7 +5403,7 @@ yargs@^12.0.4:
     y18n "^3.2.1 || ^4.0.0"
     yargs-parser "^11.1.1"
 
-zerochain-wasm-utils@0.1.14:
-  version "0.1.14"
-  resolved "https://registry.yarnpkg.com/zerochain-wasm-utils/-/zerochain-wasm-utils-0.1.14.tgz#66fda3477ffe679342b7b418ab399c935fdf52dc"
-  integrity sha512-HC0lj00H9Pos+T5LsTNibBLq4nrRz2ZtiwJV4FLm0Wc52RRsHLwHOCrALCSGFMIJ4DiGevzkbOkMJ/sQoqv/xw==
+zerochain-wasm-utils@0.1.19:
+  version "0.1.19"
+  resolved "https://registry.yarnpkg.com/zerochain-wasm-utils/-/zerochain-wasm-utils-0.1.19.tgz#7038f39f0791eb34030d0cb79dcf5ccfb04df5d2"
+  integrity sha512-W+1wqlv1TCzUkFAiEMY9gZwwM98zthIWV8pKxrN5xp8sSLqZV70rOnEbjKmJcYcGd33tAad0FKhjLB2Z6bXBvg==

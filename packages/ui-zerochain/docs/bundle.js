@@ -55,11 +55,11 @@
 /******/ 		"../oo7-zerochain/node_modules/zerochain-wasm-utils/zerochain_wasm_utils_bg.wasm": function() {
 /******/ 			return {
 /******/ 				"./zerochain_wasm_utils": {
-/******/ 					"__wbindgen_string_new": function(p0i32,p1i32) {
-/******/ 						return installedModules["../oo7-zerochain/node_modules/zerochain-wasm-utils/zerochain_wasm_utils.js"].exports["__wbindgen_string_new"](p0i32,p1i32);
-/******/ 					},
 /******/ 					"__wbindgen_json_parse": function(p0i32,p1i32) {
 /******/ 						return installedModules["../oo7-zerochain/node_modules/zerochain-wasm-utils/zerochain_wasm_utils.js"].exports["__wbindgen_json_parse"](p0i32,p1i32);
+/******/ 					},
+/******/ 					"__wbindgen_string_new": function(p0i32,p1i32) {
+/******/ 						return installedModules["../oo7-zerochain/node_modules/zerochain-wasm-utils/zerochain_wasm_utils.js"].exports["__wbindgen_string_new"](p0i32,p1i32);
 /******/ 					},
 /******/ 					"__wbindgen_rethrow": function(p0i32) {
 /******/ 						return installedModules["../oo7-zerochain/node_modules/zerochain-wasm-utils/zerochain_wasm_utils.js"].exports["__wbindgen_rethrow"](p0i32);
@@ -70,11 +70,11 @@
 /******/ 		"./node_modules/zerochain-wasm-utils/zerochain_wasm_utils_bg.wasm": function() {
 /******/ 			return {
 /******/ 				"./zerochain_wasm_utils": {
-/******/ 					"__wbindgen_string_new": function(p0i32,p1i32) {
-/******/ 						return installedModules["./node_modules/zerochain-wasm-utils/zerochain_wasm_utils.js"].exports["__wbindgen_string_new"](p0i32,p1i32);
-/******/ 					},
 /******/ 					"__wbindgen_json_parse": function(p0i32,p1i32) {
 /******/ 						return installedModules["./node_modules/zerochain-wasm-utils/zerochain_wasm_utils.js"].exports["__wbindgen_json_parse"](p0i32,p1i32);
+/******/ 					},
+/******/ 					"__wbindgen_string_new": function(p0i32,p1i32) {
+/******/ 						return installedModules["./node_modules/zerochain-wasm-utils/zerochain_wasm_utils.js"].exports["__wbindgen_string_new"](p0i32,p1i32);
 /******/ 					},
 /******/ 					"__wbindgen_rethrow": function(p0i32) {
 /******/ 						return installedModules["./node_modules/zerochain-wasm-utils/zerochain_wasm_utils.js"].exports["__wbindgen_rethrow"](p0i32);
@@ -177,7 +177,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"../oo7-zerochain/node_modules/zerochain-wasm-utils/zerochain_wasm_utils_bg.wasm":"9263937dfe861c84f3fe","./node_modules/zerochain-wasm-utils/zerochain_wasm_utils_bg.wasm":"25def24a4bc6ee12d156"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"../oo7-zerochain/node_modules/zerochain-wasm-utils/zerochain_wasm_utils_bg.wasm":"62138b2740dbcef4974a","./node_modules/zerochain-wasm-utils/zerochain_wasm_utils_bg.wasm":"44b8113ce225d4de8bb9"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {

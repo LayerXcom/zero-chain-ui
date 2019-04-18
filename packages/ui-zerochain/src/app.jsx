@@ -16,7 +16,7 @@ import { WalletList, SecretItem } from './WalletList';
 import AddressBookList from './AddressBookList';
 import TransformBondButton from './TransformBondButton';
 import Pretty from './Pretty';
-import { decrypt, decrypt_ca, gen_call } from 'zerochain-wasm-utils';
+import { decrypt, decrypt_ca, gen_call, gen_call1, gen_call2 } from 'zerochain-wasm-utils';
 
 export default class App extends ReactiveComponent {
 	constructor() {
@@ -36,7 +36,7 @@ export default class App extends ReactiveComponent {
 		this.nick = new Bond;
 		this.lookup = new Bond;
 		this.lookupRvk = this.lookup.map(v => v ? secretStore().rvkFromAccount(v) : undefined)
-		this.lookupRvk.use()		
+		this.lookupRvk.use()
 		this.lookupDecBal = this.lookup.map(v => v ? runtime.confTransfer.encryptedBalance(v).map(e => e ? decrypt_ca(e, secretStore().getIvk(v)) : undefined) : undefined)
 		this.lookupDecBal.use()
 
@@ -48,20 +48,20 @@ export default class App extends ReactiveComponent {
 
 		this.address = new Bond;
 		this.proof = new Bond;
-				
+
 		this.valueSender = new Bond;
 		this.valueRecipient = new Bond;
 		this.balanceSender = new Bond;
 		this.rk = new Bond;
-	
+
 		this.provingKey = new Bond;
 		this.preparedVk = new Bond;
 		this.encAddress = new Bond;
 		this.decBalance = this.encAddress.map(v => v ? runtime.confTransfer.encryptedBalance(v).map(e => e ? decrypt_ca(e, secretStore().getIvk(v)) : undefined) : undefined)
 		this.decBalance.use()
 
-		this.rvk = this.encAddress.map(v => v ? secretStore().rvkFromAccount(v) : undefined) 
-		this.rvk.use()		
+		this.rvk = this.encAddress.map(v => v ? secretStore().rvkFromAccount(v) : undefined)
+		this.rvk.use()
 		// this.ivk = this.encAddress.map(v => v ? secretStore().getIvk(v) : undefined)
 		// this.ivk.use()
 		this.params = new Bond;
@@ -143,8 +143,8 @@ export default class App extends ReactiveComponent {
 				<div style={{ paddingBottom: '1em' }}>
 					<WalletList />
 				</div>
-			</Segment>			
-			<Divider hidden />			
+			</Segment>
+			<Divider hidden />
 			<Segment style={{ margin: '1em' }} padded>
 				<Header as='h2'>
 					<Icon name='send' />
@@ -153,10 +153,10 @@ export default class App extends ReactiveComponent {
 						<Header.Subheader>Send the coins. The value is encrypted. </Header.Subheader>
 					</Header.Content>
 				</Header>
-				{/* <FileUploadBond bond={this.provingKey} content='Add Proving Key' />		
+				<FileUploadBond bond={this.provingKey} content='Add Proving Key' />
 				<Divider hidden />
-				<FileUploadBond bond={this.preparedVk} content='Add Verifying Key' />		
-				<Divider hidden /> */}
+				<FileUploadBond bond={this.preparedVk} content='Add Verifying Key' />
+				<Divider hidden />
 				<div style={{ fontSize: 'small' }}>From</div>
 				<SignerBond bond={this.encAddress} />
 				<If condition={this.encAddress.ready()} then={<span>
@@ -166,53 +166,59 @@ export default class App extends ReactiveComponent {
 						</Label.Detail>
 					</Label>
 					<Label>Encrypted Balance
-					<Label.Detail>							
-							<Pretty value={this.encAddress.map(e => runtime.confTransfer.encryptedBalance(e))} />																					
+					<Label.Detail>
+							<Pretty value={this.encAddress.map(e => runtime.confTransfer.encryptedBalance(e))} />
 						</Label.Detail>
-					</Label>			
+					</Label>
 					<Label>Nonce
 						<Label.Detail>
 							<Pretty value={runtime.system.accountNonce(this.rvk)} />
 						</Label.Detail>
-					</Label>							
-				</span>} />																	
+					</Label>
+				</span>} />
 				<div style={{ fontSize: 'small', paddingTop: '1em' }}>To</div>
-					<AccountIdBond bond={this.destination} />				
-				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Amount</div>				
-					<BalanceBond bond={this.amount} />							
+					<AccountIdBond bond={this.destination} />
+				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Amount</div>
+					<BalanceBond bond={this.amount} />
 				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Proof (192 bytes)</div>
-					<InputBond bond={this.proof} validator={n => n || null} placeholder='0x...' />		
+					<InputBond bond={this.proof} validator={n => n || null} placeholder='0x...' />
 				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted amount by sender (64 bytes)</div>
 				<InputBond bond={this.valueSender} validator={n => n || null} placeholder='0x...' />
 				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted amount by recipient (64 bytes)</div>
-				<InputBond bond={this.valueRecipient} validator={n => n || null} placeholder='0x...' />				
+				<InputBond bond={this.valueRecipient} validator={n => n || null} placeholder='0x...' />
 				<Divider hidden />
 				<TransactButton
 					content="Confidential transfer"
 					icon='send'
 					bond={this.params}
-					tx={{
-						sender: this.encAddress, 
-						call: calls.confTransfer.confidentialTransfer(
-							this.proof,
+					// tx={{
+					// 	sender: this.encAddress,
+					// 	call: calls.confTransfer.confidentialTransfer(
+					// 		this.proof,
+					// 		this.encAddress,
+					// 		this.destination,
+					// 		this.valueSender,
+					// 		this.valueRecipient,
+					// 		this.rvk
+					// 	),
+					// 	index: runtime.system.accountNonce(this.rvk)
+					// }}
+					tx={() => get_calls(
 							this.encAddress,
 							this.destination,
-							this.valueSender,
-							this.valueRecipient,							
-							this.rvk
-						),
-						index: runtime.system.accountNonce(this.rvk)
-					}}
-					// tx={() => get_calls(
-					// 		this.encAddress, 
-					// 		this.destination, 
-					// 		this.amount, 
-					// 		this.decBalance, 
-					// 		this.provingKey, 
-					// 		this.preparedVk
-					// 	)}
+							this.amount,
+							this.decBalance,
+							this.provingKey,
+							this.preparedVk
+						)}
 				/>
-			</Segment>		
+				{/* <Button onClick={() => get_calls(this.encAddress,
+							this.destination,
+							this.amount,
+							this.decBalance,
+							this.provingKey,
+							this.preparedVk)}/> */}
+			</Segment>
 			<Divider hidden />
 			<Segment style={{ margin: '1em' }} padded>
 				<Header as='h2'>
@@ -265,14 +271,14 @@ export default class App extends ReactiveComponent {
 				<div style={{ paddingBottom: '1em' }}>
 					<AddressBookList />
 				</div>
-			</Segment>	
+			</Segment>
 		</div>);
 	}
 }
 
-function get_calls(sender, recipient, amount, balance, provingKey, preparedVk) {		
+function get_calls(sender, recipient, amount, balance, provingKey, preparedVk) {
 	return Bond.mapAll([sender, recipient, amount, balance, provingKey, preparedVk],
-		(sender, recipient, amount, balance, provingKey, preparedVk) => {			
+		(sender, recipient, amount, balance, provingKey, preparedVk) => {
 			let sk = secretStore().seedFromAccount(sender)
 			let randomSeed = new Uint32Array(8)
 			self.crypto.getRandomValues(randomSeed)
@@ -285,9 +291,10 @@ function get_calls(sender, recipient, amount, balance, provingKey, preparedVk) {
 			console.log(provingKey)
 			console.log(preparedVk)
 
-			let args = gen_call(sk, recipient, amount, balance, provingKey, preparedVk, randomSeed) // TODO:				
+			let args = gen_call(sk, recipient, amount, balance, provingKey, preparedVk, randomSeed) // TODO:
+			console.log("AAA!!!!!")
 			return {
-				sender: sender,
+				sender: sender, 
 				call: calls.confTransfer.confidentialTransfer(
 					args.zk_proof,
 					args.address_sender,
@@ -298,6 +305,6 @@ function get_calls(sender, recipient, amount, balance, provingKey, preparedVk) {
 					args.rk
 				),
 				rsk: args.rsk
-			}			
-	})		
+			}
+	})
 }
