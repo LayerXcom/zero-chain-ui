@@ -57,6 +57,6 @@
     "utf-8-validate": "^5.0.2",
     "uuid": "^3.3.2",
     "xxhashjs": "^0.2.2",
-    "zerochain-wasm-utils": "0.2.1"
+    "zerochain-wasm-utils": "0.2.7"
   }
 }

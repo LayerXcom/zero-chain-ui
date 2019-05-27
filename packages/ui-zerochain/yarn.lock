@@ -5408,7 +5408,7 @@ yargs@^12.0.4:
     y18n "^3.2.1 || ^4.0.0"
     yargs-parser "^11.1.1"
 
-zerochain-wasm-utils@0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/zerochain-wasm-utils/-/zerochain-wasm-utils-0.2.1.tgz#be15793fb35cf9586abcf2b953d054e480167888"
-  integrity sha512-eZuaQJ4jHWl6tg1gu1klw4mc2/tDAvEuv/ltIiBFbRix5BHmkrY337e4nVhp8sM7eXuqS66lSyc63r6UIFgDvQ==
+zerochain-wasm-utils@0.2.7:
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/zerochain-wasm-utils/-/zerochain-wasm-utils-0.2.7.tgz#0e125b4d07e0a9792f6f16032e273852df01ab72"
+  integrity sha512-woivG/wukNzlmnyeBkPagu+yhGSSbuICwn/uC8kPl5u1Vo6u3rCFM6uny3CITxLMeQV4IhYDh9GVsowgYeeszQ==

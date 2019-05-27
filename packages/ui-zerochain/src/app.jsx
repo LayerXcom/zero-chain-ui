@@ -17,7 +17,7 @@ import { WalletList, SecretItem } from './WalletList';
 import AddressBookList from './AddressBookList';
 import TransformBondButton from './TransformBondButton';
 import Pretty from './Pretty';
-import { decrypt, decrypt_ca, gen_call } from 'zerochain-wasm-utils';
+import { decrypt, decrypt_ca, gen_call, gen_call2 } from 'zerochain-wasm-utils';
 
 export default class App extends ReactiveComponent {
 	constructor() {
@@ -156,10 +156,10 @@ export default class App extends ReactiveComponent {
 						<Header.Subheader>Send the coins. The value is encrypted. </Header.Subheader>
 					</Header.Content>
 				</Header>
-				{/* <FileUploadBond bond={this.provingKey} content='Add Proving Key' />
+				<FileUploadBond bond={this.provingKey} content='Add Proving Key' />
 				<Divider hidden />
 				<FileUploadBond bond={this.preparedVk} content='Add Verifying Key' />
-				<Divider hidden /> */}
+				<Divider hidden />
 				<div style={{ fontSize: 'small' }}>From</div>
 				<SignerBond bond={this.encAddress} />
 				<If condition={this.encAddress.ready()} then={<span>
@@ -183,37 +183,37 @@ export default class App extends ReactiveComponent {
 					<AccountIdBond bond={this.destination} />
 				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Amount</div>
 					<BalanceBond bond={this.amount} />
-				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Proof (192 bytes)</div>
-					<InputBond bond={this.proof} validator={n => n || null} placeholder='0x...' />
-				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted amount by sender (64 bytes)</div>
-				<InputBond bond={this.valueSender} validator={n => n || null} placeholder='0x...' />
-				<div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted amount by recipient (64 bytes)</div>
-				<InputBond bond={this.valueRecipient} validator={n => n || null} placeholder='0x...' />
+				{/* <div style={{ fontSize: 'small', paddingTop: '1em' }}>Proof (192 bytes)</div>
+					<InputBond bond={this.proof} validator={n => n || null} placeholder='0x...' /> */}
+				{/* <div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted amount by sender (64 bytes)</div>
+					<InputBond bond={this.valueSender} validator={n => n || null} placeholder='0x...' /> */}
+				{/* <div style={{ fontSize: 'small', paddingTop: '1em' }}>Encrypted amount by recipient (64 bytes)</div>
+					<InputBond bond={this.valueRecipient} validator={n => n || null} placeholder='0x...' /> */}
 				<Divider hidden />
 				<TransactButton
 					content="Confidential transfer"
 					icon='send'
 					bond={this.params}
-					tx={{
-						sender: this.encAddress,
-						call: calls.confTransfer.confidentialTransfer(
-							this.proof,
-							this.encAddress,
-							this.destination,
-							this.valueSender,
-							this.valueRecipient,
-							this.rvk
-						),
-						index: runtime.system.accountNonce(this.rvk)
-					}}
-					// tx={() => get_calls(
+					// tx={{
+					// 	sender: this.encAddress,
+					// 	call: calls.confTransfer.confidentialTransfer(
+					// 		this.proof,
 					// 		this.encAddress,
 					// 		this.destination,
-					// 		this.amount,
-					// 		this.decBalance,
-					// 		this.provingKey,
-					// 		this.preparedVk
-					// 	)}
+					// 		this.valueSender,
+					// 		this.valueRecipient,
+					// 		this.rvk
+					// 	),
+					// 	index: runtime.system.accountNonce(this.rvk)
+					// }}
+					tx={() => get_calls(
+							this.encAddress,
+							this.destination,
+							this.amount,
+							this.decBalance,
+							this.provingKey,
+							this.preparedVk
+						)}
 				/>
 			</Segment>
 			<Divider hidden />
@@ -288,6 +288,29 @@ function get_calls(sender, recipient, amount, balance, provingKey, preparedVk) {
 			console.log(provingKey)
 			console.log(preparedVk)
 
+			// let promise = new Promise((resolve, reject) => {
+			// 	let args = gen_call(sk, recipient, amount, balance, provingKey_str, preparedVk, randomSeed)
+			// 	resolve(args)
+			// })
+
+			// return promise.then((args) => {
+			// 	return {
+			// 		sender: sender,
+			// 		call: calls.confTransfer.confidentialTransfer(
+			// 			args.zk_proof,
+			// 			args.address_sender,
+			// 			args.address_recipient,
+			// 			args.value_sender,
+			// 			args.value_recipient,
+			// 			args.balance_sender,
+			// 			args.rk
+			// 		),
+			// 		rsk: args.rsk
+			// 	}
+			// })
+			// .catch((err) => {
+			// 	console.log(err);
+			// })
 			let args = gen_call(sk, recipient, amount, balance, provingKey, preparedVk, randomSeed) // TODO:
 			return {
 				sender: sender,
